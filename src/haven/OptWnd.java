@@ -27,7 +27,7 @@
 package haven;
 
 public class OptWnd extends Window {
-    public final Panel main, video, audio, display, map, general, combat;
+    public final Panel main, video, audio, display, map, general, combat, control;
     public Panel current;
 
     public void chpanel(Panel p) {
@@ -288,7 +288,7 @@ public class OptWnd extends Window {
         map = add(new Panel());
         general = add(new Panel());
         combat = add(new Panel());
-
+        control = add(new Panel());
         int y;
 
         main.add(new PButton(200, "Video settings", 'v', video), new Coord(0, 0));
@@ -297,6 +297,7 @@ public class OptWnd extends Window {
         main.add(new PButton(200, "Map settings", 'm', map), new Coord(0, 90));
         main.add(new PButton(200, "General settings", 'g', general), new Coord(210, 0));
         main.add(new PButton(200, "Combat settings", 'c', combat), new Coord(210, 30));
+        main.add(new PButton(200, "Control settings", 'k', control), new Coord(210, 60));
 
         if (gopts) {
             main.add(new Button(200, "Switch character") {
@@ -532,30 +533,6 @@ public class OptWnd extends Window {
             }
         }, new Coord(0, y));
         y += 35;
-        display.add(new CheckBox("Free camera rotation") {
-            {
-                a = Config.camfree;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("camfree", val);
-                Config.camfree = val;
-                a = val;
-            }
-        }, new Coord(0, y));
-        y += 35;
-        display.add(new Label("Bad camera scrolling sensitivity"), new Coord(0, y));
-        display.add(new HSlider(50, 0, 50, 0) {
-            protected void attach(UI ui) {
-                super.attach(ui);
-                val = Config.badcamsensitivity;
-            }
-            public void changed() {
-                Config.badcamsensitivity = val;
-                Utils.setprefi("badcamsensitivity", val);
-            }
-        }, new Coord(160, y));
-        y += 35;
         display.add(new CheckBox("Show item quality") {
             {
                 a = Config.showquality;
@@ -617,6 +594,18 @@ public class OptWnd extends Window {
             public void set(boolean val) {
                 Utils.setprefb("qualitywhole", val);
                 Config.qualitywhole = val;
+                a = val;
+            }
+        }, new Coord(0, y));
+        y += 35;
+        display.add(new CheckBox("Draw background for quality values") {
+            {
+                a = Config.qualitybg;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("qualitybg", val);
+                Config.qualitybg = val;
                 a = val;
             }
         }, new Coord(0, y));
@@ -823,18 +812,6 @@ public class OptWnd extends Window {
                 Utils.setprefb("savemmap", val);
                 Config.savemmap = val;
                 MapGridSave.mgs = null;
-                a = val;
-            }
-        }, new Coord(0, y));
-        y += 35;
-        map.add(new CheckBox("MMB to drag & L/RMB to move") {
-            {
-                a = Config.alternmapctrls;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("alternmapctrls", val);
-                Config.alternmapctrls = val;
                 a = val;
             }
         }, new Coord(0, y));
@@ -1067,6 +1044,48 @@ public class OptWnd extends Window {
 
         combat.add(new PButton(200, "Back", 27, main), new Coord(270, 360));
         combat.pack();
+
+        // -------------------------------------------- control
+        y = 0;
+        control.add(new CheckBox("Free camera rotation") {
+            {
+                a = Config.camfree;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("camfree", val);
+                Config.camfree = val;
+                a = val;
+            }
+        }, new Coord(0, y));
+        y += 35;
+        control.add(new Label("Bad camera scrolling sensitivity"), new Coord(0, y));
+        control.add(new HSlider(50, 0, 50, 0) {
+            protected void attach(UI ui) {
+                super.attach(ui);
+                val = Config.badcamsensitivity;
+            }
+            public void changed() {
+                Config.badcamsensitivity = val;
+                Utils.setprefi("badcamsensitivity", val);
+            }
+        }, new Coord(160, y));
+        y += 35;
+        control.add(new CheckBox("Minimap: use MMB to drag & L/RMB to move") {
+            {
+                a = Config.alternmapctrls;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("alternmapctrls", val);
+                Config.alternmapctrls = val;
+                a = val;
+            }
+        }, new Coord(0, y));
+
+        control.add(new PButton(200, "Back", 27, main), new Coord(270, 360));
+        control.pack();
+
 
         chpanel(main);
     }
