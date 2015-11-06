@@ -13,7 +13,6 @@ public class UpdateChecker extends Thread {
     public void run() {
         try {
             JSONObject json = getjson();
-
             String latestver = json.getString("tag_name");
             String currentver = Config.version;
             int j6 = currentver.indexOf("_");
@@ -21,9 +20,7 @@ public class UpdateChecker extends Thread {
                 currentver = currentver.substring(0, j6);
 
             if (isnewer(currentver, latestver) && HavenPanel.lui != null && HavenPanel.lui.root != null) {
-                JSONArray assets = json.getJSONArray("assets");
-                String latesturl =  assets.getJSONObject(j6 > 0 ? 1 : 0).getString("browser_download_url");
-                Window updwnd = new UpdateWnd(latesturl, j6 > 0 ? latestver + "_j6" : latestver);
+                Window updwnd = new UpdateWnd(latestver);
                 HavenPanel.lui.root.add(updwnd);
                 updwnd.show();
                 updwnd.raise();
