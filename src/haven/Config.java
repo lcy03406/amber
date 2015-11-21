@@ -114,16 +114,21 @@ public class Config {
     public static boolean showinvonlogin = Utils.getprefb("showinvonlogin", false);
     public static boolean autopick = Utils.getprefb("autopick", false);
     public static boolean autoharvest = Utils.getprefb("autoharvest", false);
+    public static boolean autoeat = Utils.getprefb("autoeat", false);
     public static boolean runonlogin = Utils.getprefb("runonlogin", false);
     public static Coord chatsz = Utils.getprefc("chatsz", Coord.z);
     public static boolean alternmapctrls = Utils.getprefb("alternmapctrls", false);
     public static boolean autostudy = Utils.getprefb("autostudy", true);
     public static boolean showcontentsbars = Utils.getprefb("showcontentsbars", false);
-    public static boolean dropseeds = Utils.getprefb("dropseeds", false);
     public static boolean showdmgop = Utils.getprefb("showdmgop", false);
     public static boolean showdmgmy = Utils.getprefb("showdmgmy", false);
     public static boolean hidegobs = Utils.getprefb("hidegobs", false);
     public static boolean qualitybg = Utils.getprefb("qualitybg", false);
+    public static boolean showwearbars = Utils.getprefb("showwearbars", false);
+    public static boolean tilecenter = Utils.getprefb("tilecenter", false);
+    public static boolean userazerty = Utils.getprefb("userazerty", false);
+    public static boolean hlightcuropp = Utils.getprefb("hlightcuropp", false);
+    public static boolean agroclosest = Utils.getprefb("agroclosest", false);
     public static boolean hwcursor = false;
     public static String playerposfile;
     public static byte[] authck = null;
@@ -152,16 +157,18 @@ public class Config {
     public static String[] treessel = Utils.getprefsa("treessel", null);
 
     public final static String[] icons = new String[]{"dandelion", "chantrelle", "blueberry", "rat", "chicken", "chick",
-            "spindlytaproot", "stingingnettle", "dragonfly", "toad", "bram", "rowboat"};
+            "spindlytaproot", "stingingnettle", "dragonfly", "toad", "bram", "rowboat", "arrow", "boarspear"};
     public static String[] iconssel = Utils.getprefsa("iconssel", null);
 
-    public final static Map<String, Tex> additonalicons = new HashMap<String, Tex>(6) {{
+    public final static Map<String, Tex> additonalicons = new HashMap<String, Tex>(8) {{
         put("gfx/terobjs/vehicle/bram", Resource.loadtex("gfx/icons/bram"));
         put("gfx/kritter/toad/toad", Resource.loadtex("gfx/icons/toad"));
         put("gfx/terobjs/vehicle/rowboat", Resource.loadtex("gfx/icons/rowboat"));
         put("gfx/kritter/chicken/chicken", Resource.loadtex("gfx/icons/deadhen"));
         put("gfx/kritter/chicken/rooster", Resource.loadtex("gfx/icons/deadrooster"));
         put("gfx/kritter/rabbit/rabbit", Resource.loadtex("gfx/icons/deadrabbit"));
+        put("gfx/terobjs/items/arrow", Resource.loadtex("gfx/icons/arrow"));
+        put("gfx/terobjs/items/boarspear", Resource.loadtex("gfx/icons/arrow"));
     }};
 
     public final static Set<String> dangerousgobres = new HashSet<String>(Arrays.asList(

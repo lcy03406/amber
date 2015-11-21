@@ -767,6 +767,19 @@ public class OptWnd extends Window {
                 a = val;
             }
         }, new Coord(260, y));
+        // -------------------------------------------- display 3rd column
+        y = 0;
+        display.add(new CheckBox("Show wear bars") {
+            {
+                a = Config.showwearbars;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("showwearbars", val);
+                Config.showwearbars = val;
+                a = val;
+            }
+        }, new Coord(560, y));
 
         display.add(new Button(220, "Reset Windows (req. logout)") {
             @Override
@@ -1001,6 +1014,18 @@ public class OptWnd extends Window {
             }
         }, new Coord(0, y));
         y += 35;
+        general.add(new CheckBox("Automatically select 'Eat' action") {
+            {
+                a = Config.autoeat;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("autoeat", val);
+                Config.autoeat = val;
+                a = val;
+            }
+        }, new Coord(0, y));
+        y += 35;
         general.add(new CheckBox("Run on login") {
             {
                 a = Config.runonlogin;
@@ -1038,6 +1063,30 @@ public class OptWnd extends Window {
             public void set(boolean val) {
                 Utils.setprefb("showdmgmy", val);
                 Config.showdmgmy = val;
+                a = val;
+            }
+        }, new Coord(0, y));
+        y += 35;
+        combat.add(new CheckBox("Highlight current opponent") {
+            {
+                a = Config.hlightcuropp;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("hlightcuropp", val);
+                Config.hlightcuropp = val;
+                a = val;
+            }
+        }, new Coord(0, y));
+        y += 35;
+        combat.add(new CheckBox("Aggro closest unknown/red player on Tab key") {
+            {
+                a = Config.agroclosest;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("agroclosest", val);
+                Config.agroclosest = val;
                 a = val;
             }
         }, new Coord(0, y));
@@ -1079,6 +1128,18 @@ public class OptWnd extends Window {
             public void set(boolean val) {
                 Utils.setprefb("alternmapctrls", val);
                 Config.alternmapctrls = val;
+                a = val;
+            }
+        }, new Coord(0, y));
+        y += 35;
+        control.add(new CheckBox("Use French (AZERTY) keyboard layout") {
+            {
+                a = Config.userazerty;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("userazerty", val);
+                Config.userazerty = val;
                 a = val;
             }
         }, new Coord(0, y));
