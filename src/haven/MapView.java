@@ -1495,6 +1495,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
             return (true);
         if ((placing != null) && placing.adjust.rotate(placing, amount, ui.modflags()))
             return (true);
+        if (ui.modshift) {
+            gameui().fv.rotateopp();
+            return true;
+        }
         return (((Camera) camera).wheel(c, amount));
     }
 
@@ -1672,7 +1676,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
                 modflags = ui.modflags();
                 xl.mv = true;
                 mgrab = ui.grabmouse(MapView.this);
-                ol = glob.map.new Overlay(sc, sc, 1 << 17);
+                synchronized (glob.map.grids) {
+                    ol = glob.map.new Overlay(sc, sc, 1 << 17);
+                }
                 return (true);
             }
         }
