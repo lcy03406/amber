@@ -26,16 +26,20 @@
 
 package haven;
 
-import static haven.MCache.tilesz;
-
 import haven.GLProgram.VarID;
+import haven.pathfinder.*;
 import haven.resutil.BPRadSprite;
 
-import java.awt.Color;
+import javax.media.opengl.GL;
+import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.lang.reflect.*;
-import javax.media.opengl.*;
+import java.util.List;
+import java.util.Map;
+
+import static haven.MCache.tilesz;
 
 public class MapView extends PView implements DTarget, Console.Directory {
     public static long plgob = -1;
@@ -750,6 +754,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
         return (glob.oc.getgob(plgob));
     }
 
+    public MapView mapview() {
+        return this;
+    }
+
     public Coord3f getcc() {
         Gob pl = player();
         if (pl != null)
@@ -1338,6 +1346,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
         return (-1);
     }
 
+    private Pathfinder pf;
+    private Thread pfthread;
+
     private class Click extends Hittest {
         int clickb;
 
@@ -1352,7 +1363,53 @@ public class MapView extends PView implements DTarget, Console.Directory {
                     mc.x = mc.x / 11 * 11 + 5;
                     mc.y = mc.y / 11 * 11 + 5;
                 }
-                wdgmsg("click", pc, mc, clickb, ui.modflags());
+
+                if (ui.modshift && ui.modctrl) {
+                    Coord plc = player().rc;
+                    OCache oc = ui.sess.glob.oc;
+
+                    long starttotal = System.nanoTime();
+                    int gcx = haven.pathfinder.Map.origin - (plc.x - mc.x);
+                    int gcy = haven.pathfinder.Map.origin - (plc.y - mc.y);
+                    haven.pathfinder.Map m = new haven.pathfinder.Map(plc, new Coord(gcx, gcy), glob.map);
+
+                    long start = System.nanoTime();
+                    synchronized (oc) {
+                        for (Gob gob : oc) {
+                            if (gob.isplayer())
+                                continue;
+                            m.addGob(gob);
+                        }
+                    }
+                    System.out.println("      Gobs Processing: " + (double) (System.nanoTime() - start) / 1000000.0 + " ms.");
+
+                    m.main();
+                    System.out.println("                Total: " + (double) (System.nanoTime() - starttotal) / 1000000.0 + " ms.");
+
+                    m.dbgdump();
+                } else {
+                    if (ui.modmeta && ui.modctrl) {
+                        synchronized (Pathfinder.class) {
+                            if (pf != null) {
+                                pf.terminate = true;
+                                pfthread.interrupt();
+                                if (player().getattr(Moving.class) != null)
+                                    wdgmsg("click", Coord.z, player().rc, clickb, 0); // ui.modflags()
+                            }
+
+                            Coord src = player().rc;
+                            int gcx = haven.pathfinder.Map.origin - (src.x - mc.x);
+                            int gcy = haven.pathfinder.Map.origin - (src.y - mc.y);
+
+                            pf = new Pathfinder(mapview(), src, new Coord(gcx, gcy));
+                            glob.oc.setPathfinder(pf);
+                            pfthread = new Thread(pf);
+                            pfthread.start();
+                        }
+                    } else {
+                        wdgmsg("click", Coord.z, mc, clickb, ui.modflags());
+                    }
+                }
             } else {
                 if (ui.modmeta && clickb == 1) {
                     for (Widget w = gameui().chat.lchild; w != null; w = w.prev) {
