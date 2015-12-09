@@ -815,6 +815,18 @@ public class OptWnd extends Window {
                 a = val;
             }
         }, new Coord(560, y));
+        /*y += 35;
+        display.add(new CheckBox("Show animal radius") {
+            {
+                a = Config.showanimalrad;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("showanimalrad", val);
+                Config.showanimalrad = val;
+                a = val;
+            }
+        }, new Coord(560, y));*/
 
         display.add(new Button(220, "Reset Windows (req. logout)") {
             @Override
@@ -1061,6 +1073,18 @@ public class OptWnd extends Window {
             }
         }, new Coord(0, y));
         y += 35;
+        general.add(new CheckBox("Automatically select 'Split' action") {
+            {
+                a = Config.autosplit;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("autosplit", val);
+                Config.autosplit = val;
+                a = val;
+            }
+        }, new Coord(0, y));
+        y += 35;
         general.add(new CheckBox("Run on login") {
             {
                 a = Config.runonlogin;
@@ -1121,6 +1145,19 @@ public class OptWnd extends Window {
                 a = val;
             }
         }, new Coord(260, y));
+        y += 35;
+        general.add(new CheckBox("Select System log on login") {
+            {
+                a = Config.syslogonlogin;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("syslogonlogin", val);
+                Config.syslogonlogin = val;
+                a = val;
+            }
+        }, new Coord(260, y));
+
 
         general.add(new PButton(200, "Back", 27, main), new Coord(270, 360));
         general.pack();

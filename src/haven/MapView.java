@@ -26,16 +26,18 @@
 
 package haven;
 
-import static haven.MCache.tilesz;
-
 import haven.GLProgram.VarID;
 import haven.resutil.BPRadSprite;
 
-import java.awt.Color;
+import javax.media.opengl.GL;
+import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.lang.reflect.*;
-import javax.media.opengl.*;
+import java.util.List;
+
+import static haven.MCache.tilesz;
 
 public class MapView extends PView implements DTarget, Console.Directory {
     public static long plgob = -1;
@@ -63,9 +65,13 @@ public class MapView extends PView implements DTarget, Console.Directory {
         put("gfx/terobjs/trough", new Gob.Overlay(new BPRadSprite(200.0F, -10.0F)));
         put("gfx/terobjs/beehive", new Gob.Overlay(new BPRadSprite(151.0F, -10.0F)));
     }};
+    private static final Gob.Overlay animalradius = new Gob.Overlay(new BPRadSprite(100.0F, -10.0F));
     private long lastmmhittest = System.currentTimeMillis();
     private Coord lasthittestc = Coord.z;
     public AreaMine areamine;
+
+    private static final  Set<String> dangerousanimalrad = new HashSet<String>(Arrays.asList(
+            "gfx/kritter/bear/bear", "gfx/kritter/boar/boar", "gfx/kritter/lynx/lynx", "gfx/kritter/badger/badger"));
 
     public interface Delayed {
         public void run(GOut g);
@@ -615,6 +621,15 @@ public class MapView extends PView implements DTarget, Console.Directory {
                     gob.ols.remove(rovl);
                 }
             }
+
+            /*if (res != null && dangerousanimalrad.contains(res.name)) {
+                if (Config.showanimalrad) {
+                    if (!gob.ols.contains(animalradius))
+                        gob.ols.add(animalradius);
+                } else {
+                    gob.ols.remove(animalradius);
+                }
+            }*/
         } catch (Loading le) {
         }
     }
@@ -758,11 +773,24 @@ public class MapView extends PView implements DTarget, Console.Directory {
             return (new Coord3f(cc.x, cc.y, glob.map.getcz(cc)));
     }
 
+    private TexGL clickbuf = null;
+    private GLFrameBuffer clickfb = null;
     private final RenderContext clickctx = new RenderContext();
 
     private GLState.Buffer clickbasic(GOut g) {
         GLState.Buffer ret = basic(g);
         clickctx.prep(ret);
+        if ((clickbuf == null) || !clickbuf.sz().equals(sz)) {
+            if (clickbuf != null) {
+                clickfb.dispose();
+                clickfb = null;
+                clickbuf.dispose();
+                clickbuf = null;
+            }
+            clickbuf = new TexE(sz, GL.GL_RGB, GL.GL_RGB, GL.GL_UNSIGNED_BYTE);
+            clickfb = new GLFrameBuffer(clickbuf, null);
+        }
+        clickfb.prep(ret);
         return (ret);
     }
 
@@ -1428,9 +1456,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
             if ((placing.lastmc == null) || !placing.lastmc.equals(c)) {
                 delay(placing.new Adjust(c, ui.modflags()));
             }
-        } else if (ui.modshift && !ui.modctrl) {
+        } else if (ui.modshift && !ui.modctrl && Config.resinfo) {
             long now = System.currentTimeMillis();
-            if (now - lastmmhittest > 500 || lasthittestc.dist(c) > tilesz.x) {
+            if ((now - lastmmhittest > 500 || lasthittestc.dist(c) > tilesz.x) && gameui().hand.isEmpty()) {
                 lastmmhittest = now;
                 lasthittestc = c;
                 delay(new Hittest(c) {
@@ -1450,7 +1478,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
                     }
                 });
             }
-        } else if (ui.modshift && ui.modctrl) {
+        } else if (ui.modshift && ui.modctrl && Config.resinfo) {
             long now = System.currentTimeMillis();
             if (now - lastmmhittest > 500 || lasthittestc.dist(c) > tilesz.x) {
                 lastmmhittest = now;
@@ -1534,8 +1562,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
                         lastintergobrc = inf.gob.rc;
                         lastintermid = getid(inf.r);
                         wdgmsg("itemact", pc, mc, ui.modflags(), 0, lastintergobid, lastintergobrc, 0, lastintermid);
-                    }
-                    else {
+                    } else {
                         wdgmsg("itemact", pc, mc, ui.modflags(), 1, (int) inf.gob.id, inf.gob.rc, inf.ol.id, getid(inf.r));
                     }
                 }
@@ -1693,7 +1720,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
                     mgrab.remove();
                     if (mv != null) {
                         areamine = new AreaMine(ol.getc1(), ol.getc2(), mv);
-                        new Thread(areamine, "areamine").start();
+                        new Thread(areamine, "Area miner").start();
                         if (selection != null) {
                             selection.destroy();
                             selection = null;
