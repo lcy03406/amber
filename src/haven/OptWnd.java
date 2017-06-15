@@ -769,6 +769,17 @@ public class OptWnd extends Window {
                 }
             }
         });
+        appender.add(new CheckBox("Save barter logs to disk") {
+            {
+                a = Config.bartersave;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("bartersave", val);
+                Config.bartersave = val;
+                a = val;
+            }
+        });
         appender.add(new CheckBox("Save map tiles to disk") {
             {
                 a = Config.savemmap;

@@ -52,6 +52,7 @@ import haven.purus.KeyBindings;
 import haven.purus.pbot.PBotAPI;
 import haven.purus.pbot.PBotScriptlist;
 import haven.resutil.FoodInfo;
+import haven.res.ui.barterbox.Shopbox;
 
 public class GameUI extends ConsoleHost implements Console.Directory {
     public static final Text.Foundry msgfoundry = new Text.Foundry(Text.dfont, Text.cfg.msg);
@@ -1551,6 +1552,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
         cmdmap.put("baseq", (cons, args) -> {
             FoodInfo.showbaseq = Utils.parsebool(args[1]);
             msg("q10 FEP values in tooltips are now " + (FoodInfo.showbaseq ? "enabled" : "disabled"));
+        });
+        cmdmap.put("shopsum", (cons, args) -> {
+        	Shopbox.summarize();
         });
     }
     

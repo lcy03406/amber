@@ -215,11 +215,29 @@ public class Resource implements Serializable {
         prscache = cache;
     }
 
+    public String groupname() {
+    	String[] sp = name.split("/");
+    	int index = sp.length-2;
+    	if (index < 0)
+    		index = 0;
+    	return sp[index];
+    }
+    
     public String basename() {
+    	String lastname = "";
         int p = name.lastIndexOf('/');
         if (p < 0)
-            return (name);
-        return (name.substring(p + 1));
+            lastname = name;
+        else
+        	lastname = name.substring(p + 1);
+        return lastname;
+    }
+    
+    public String locname() {
+    	Tooltip tt = this.layer(Tooltip.class);
+    	if (tt == null)
+    		return null;
+    	return getLocContent(tt.t);
     }
 
     public static interface ResSource {

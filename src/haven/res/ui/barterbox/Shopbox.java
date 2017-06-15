@@ -36,6 +36,21 @@ import haven.Widget;
 import haven.res.lib.tspec.Spec;
 import haven.res.ui.tt.q.qbuff.QBuff;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.TreeMap;
+
 // ui/barterstand
 public class Shopbox extends Widget implements SpriteOwner, Owner {
     public static final Text any = Text.render(Resource.getLocString(Resource.BUNDLE_LABEL, "Any"));
@@ -51,6 +66,7 @@ public class Shopbox extends Widget implements SpriteOwner, Owner {
     public ResData res;
     public Spec price;
     public Text num;
+    public int left;
     public int pnum;
     public int pq;
     private Text pnumt;
@@ -157,6 +173,7 @@ public class Shopbox extends Widget implements SpriteOwner, Owner {
             QBuff qb = quality();
             if (qb != null)
                 quality = Text.render((int) qb.q + "");
+            savelog();
         }
         return this.cinfo;
     }
@@ -311,7 +328,8 @@ public class Shopbox extends Widget implements SpriteOwner, Owner {
             int var7;
             if (var1 == "n") {
                 var7 = ((Integer) var2[0]).intValue();
-                this.num = Text.render(String.format("%d left", new Object[]{Integer.valueOf(var7)}));
+                this.left = var7;
+                this.num = Text.render(String.format("%d Left", new Object[]{Integer.valueOf(var7)}));
             } else if (var1 == "price") {
                 byte var8 = 0;
                 if (var2[var8] == null) {
@@ -347,12 +365,298 @@ public class Shopbox extends Widget implements SpriteOwner, Owner {
                     this.pqe.settext(this.pq > 0 ? Integer.toString(this.pq) : "");
                     this.pqe.commit();
                 }
-
+                
                 this.updbtn();
             } else {
                 super.uimsg(var1, var2);
             }
         }
+    }
+    
+    Object findInfo(Object[] infolist, int id, int index) {
+    	for (Object one: infolist) {
+    		if (one instanceof Object[]) {
+    			Object[] info = (Object[]) one;
+    			if (info.length > index && info[0] instanceof Integer && (Integer)info[0] == id) {
+    				return info[index];
+    			}
+    		}
+    	}
+    	return null;
+    }
+    
+    String findItemName(Object[] info) {
+    	Object[] list = info;
+    	Object c = findInfo(list, 6189, 1);
+    	if (c != null && c instanceof Object[]) {
+    		list = (Object[]) c;
+    		return findItemName(list);
+    	}
+    	Object o = findInfo(list, 6188, 1);
+    	if (o != null && o instanceof String) {
+    		String name = (String) o;
+        	//if (Character.isDigit(name.charAt(0))) {
+        	//	name = name.substring(name.indexOf(' ')+1);
+        	//}
+        	return name;
+        }
+    	return null;
+    }
+    
+    int findItemNum(Object[] info, int def) {
+    	Object[] list = info;
+    	Object c = findInfo(list, 6189, 1);
+    	if (c != null && c instanceof Object[]) {
+    		list = (Object[]) c;
+    		return findItemNum(list, def);
+    	}
+    	Object o = findInfo(list, 6186, 1);
+    	if (o != null && o instanceof Integer) {
+    		return (Integer) o;
+        }
+    	return def;
+    }
+   
+    int findItemQ(Object[] info, int def) {
+    	Object[] list = info;
+    	Object c = findInfo(list, 6189, 1);
+    	if (c != null && c instanceof Object[]) {
+    		list = (Object[]) c;
+    		return findItemQ(list, def);
+    	}
+    	Object o = findInfo(info, 6185, 1);
+    	if (o != null && o instanceof Float) {
+    		return (int)(float)(Float) o;
+        }
+    	return def;
+    }
+    
+    String findItemCoin(Object[] infolist) {
+    	Object oname = findInfo(infolist, 6200, 1);
+    	if (oname != null && oname instanceof String) {
+    		String name = (String) oname;
+        	return name;
+        }
+    	return "";
+    }
+    
+    class ShopItem {
+    	public String group;
+    	public String res;
+    	public String name;
+    	public int q;
+    	public int num;
+    	public boolean coin;
+    	
+    	public void init(ResData res, List<ItemInfo> cinfo, Object[] info, int q, int num) {
+    		this.group = res.res.get().groupname();
+        	this.res = res.res.get().basename() + "#" + res.res.get().ver;
+        	this.q = findItemQ(info, q);
+        	if (group.equals("coins")) {
+        		this.coin = true;
+        		this.res = this.res.replace('-', ' ').split(" ")[0];
+        		this.name = findItemCoin(info) + "@" + this.res;
+            	this.num = findItemNum(info, num);
+        	} else {
+        		this.name = getItemName(cinfo);
+	        	if (this.name == null)
+	        		this.name = findItemName(info);
+        		if (this.name == null)
+        			this.name = res.res.get().locname();
+        		if (this.name == null)
+        			this.name = "Unknown";
+            	this.num = num;
+        	}
+    	}
+    }
+    
+    class ShopOffer {
+    	public ShopItem sell = new ShopItem();
+    	public ShopItem price = new ShopItem();
+    	public int left;
+    }
+    
+    private String getItemName(List<ItemInfo> infolist) {
+    	String name = null;
+    	if (infolist == null)
+    		return name;
+        for (ItemInfo info : infolist) {
+            if (info instanceof ItemInfo.Name) {
+            	ItemInfo.Name iname = (ItemInfo.Name) info;
+            	name = iname.str.text;
+            }
+            if (info instanceof ItemInfo.Contents) {
+            	ItemInfo.Contents icontents = (ItemInfo.Contents) info;
+            	name = getItemName(icontents.sub);
+            }
+        }
+    	//if (Character.isDigit(name.charAt(0))) {
+    	//	name = name.substring(name.indexOf(' ')+1);
+    	//}
+        return name;
+    }
+
+    ShopOffer so = null;
+
+    static String logpath = "barterlog";
+    static String sumpath = "bartersummary";
+    static String buyprefix = "buy with";
+    static String sellprefix = "sell with";
+    void savelog() {
+        if (!Config.bartersave)
+        	return;
+    	if (so != null)
+    		return;
+    	if (res == null)
+    		return;
+    	so = new ShopOffer();
+    	so.sell.init(this.res, this.cinfo, this.info, 0, 1);
+    	if (this.price != null) {
+    		so.price.init(this.price.res, this.price.info(), this.price.info, this.pq, this.pnum);
+    	}
+    	so.left = this.left;
+        String summary = String.format("[Barter Stand] Sell:%s q:%d num:%d left:%d Price:%s pq:%d pnum:%d",
+        		so.sell.name, so.sell.q, so.sell.num, so.left, so.price.name, so.price.q, so.price.num);
+        this.gameui().msg(summary);
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        String way, coinname;
+        String data;
+        if (!so.sell.coin && so.price.coin) {
+        	way = sellprefix;
+        	ShopItem item = so.sell;
+        	ShopItem coin = so.price;
+        	coinname = coin.name;
+        	data = String.format("%s,%s,%d,%d,%d,%d", item.name,item.res,item.q,item.num,coin.num,so.left);
+        } else if (so.sell.coin && !so.price.coin) {
+        	way = buyprefix;
+        	ShopItem item = so.price;
+        	ShopItem coin = so.sell;
+        	coinname = coin.name;
+        	data = String.format("%s,%s,%d,%d,%d,%d", item.name,item.res,item.q,item.num,coin.num,so.left);
+        //} else if (so.sell.coin && so.price.coin){
+        //	way = "bank";
+        //	coinname = "";
+        //	ShopItem item = so.sell;
+        //	ShopItem coin = so.price;
+        //	data = String.format("%s,%s,%d,%s,%s,%d,%d", item.name,item.res,item.num,coin.name,coin.res,coin.num,so.left);
+        } else {
+        	return;
+        }
+        String path = String.format("%s/%s", logpath, date);
+        new File(path).mkdirs();
+        String filename = String.format("%s/%s %s.csv", path, way, coinname);
+        try(FileOutputStream file = new FileOutputStream(filename, true);
+        		OutputStreamWriter osw = new OutputStreamWriter(file, Charset.forName("UTF-8").newEncoder());
+        		PrintWriter barterlog = new PrintWriter(osw, true);) {
+            barterlog.println(data);
+            barterlog.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    static class ShopData {
+    	public int q;
+    	public float price;
+    	public int left;
+    	
+    	public void update(int q, float price, int left) {
+    		this.q = q;
+    		this.price = price;
+    		this.left = left;
+    	}
+    }
+    
+    static class ShopStat {
+    	ShopData highQ = new ShopData();
+    	ShopData lowQ = new ShopData();
+    	ShopData highPrice = new ShopData();
+    	ShopData lowPrice = new ShopData();
+    	ShopData highLeft = new ShopData();
+    }
+    
+    static void summarize(List<String> csvdata, File sumfile) {
+    	boolean buy = sumfile.getName().startsWith(buyprefix);
+    	TreeMap<String, ShopStat> data = new TreeMap<String, ShopStat>();
+    	for (String csv : csvdata) {
+    		String[] fields = csv.split(",");
+    		String name = fields[0];
+    		String res = fields[1];
+    		int q = Integer.parseInt(fields[2]);
+    		int num = Integer.parseInt(fields[3]);
+    		float price = Integer.parseInt(fields[4])/(float)num;
+    		int left = Integer.parseInt(fields[5]) * num;
+    		//String title = String.format("%s@%s", name, res);
+    		String title = name;
+    		//TODO translate
+    		ShopStat stat = data.get(title);
+    		if (stat == null) {
+    			stat = new ShopStat();
+    			data.put(title, stat);
+    		}
+    		if (buy ? (q > stat.highQ.q || q == stat.highQ.q && price > stat.highQ.price)
+    				: (q > stat.highQ.q || q == stat.highQ.q && price < stat.highQ.price)) {
+    			stat.highQ.update(q, price, left);
+    		}
+    		if (stat.lowQ.left == 0 || (buy ? (q < stat.lowQ.q || q == stat.lowQ.q && price > stat.lowQ.price)
+    				: (q < stat.lowQ.q || q == stat.lowQ.q && price < stat.lowQ.price))) {
+    			stat.lowQ.update(q, price, left);
+    		}
+    		if (buy ? (price > stat.highPrice.price || price == stat.highPrice.price && q < stat.highPrice.q)
+    				: (price > stat.highPrice.price || price == stat.highPrice.price && q > stat.highPrice.q)) {
+    			stat.highPrice.update(q, price, left);
+    		}
+    		if (stat.lowPrice.left == 0 || (buy ? (price < stat.lowPrice.price || price == stat.lowPrice.price && q < stat.highPrice.q)
+    				: (price < stat.lowPrice.price || price == stat.lowPrice.price && q > stat.highPrice.q))) {
+    			stat.lowPrice.update(q, price, left);
+    		}
+    		if (buy ? (left > stat.highLeft.left || left == stat.highLeft.left && price > stat.highLeft.price)
+    				: (left > stat.highLeft.left || left == stat.highLeft.left && price < stat.highLeft.price)) {
+    			stat.highLeft.update(q, price, left);
+    		}
+    	}
+        try(PrintWriter writer = new PrintWriter(sumfile)) {
+        	if (buy) {
+        		writer.println("物品,最高q,最高q的最高价,最低q,最低q的最高价,最高价,最高价的最低q,最低价,最低价的最低q,最大单笔,最大单笔的价格,最大单笔的q");
+        	} else {
+        		writer.println("物品,最高q,最高q的最低价,最低q,最低q的最低价,最高价,最高价的最高q,最低价,最低价的最高q,最大单笔,最大单笔的价格,最大单笔的q");
+        	}
+        	data.forEach((String title, ShopStat stat) -> {
+        		writer.println(String.format("%s,%d,%.02f,%d,%.02f,%.02f,%d,%.02f,%d,%d,%.02f,%d",
+        				title, stat.highQ.q, stat.highQ.price, stat.lowQ.q, stat.lowQ.price,
+        				stat.highPrice.price, stat.highPrice.q, stat.lowPrice.price, stat.lowPrice.q,
+        				stat.highLeft.left, stat.highLeft.price, stat.highLeft.q));
+        	});
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void summarize() {
+    	File logdir = new File(logpath);
+    	if (logdir.exists() && logdir.isDirectory()) {
+    		File[] logdates = logdir.listFiles();
+    		for (File logdate : logdates) {
+    			if (logdate.isDirectory()) {
+    				File[] logfiles = logdate.listFiles();
+    				String sumdate = String.format("%s/%s", sumpath, logdate.getName());
+    				File sumdir = new File(sumdate);
+    				sumdir.mkdirs();
+    				for (File logfile : logfiles) {
+    					String logname = logfile.getName();
+    					if (logname.endsWith(".csv")) {
+    						try {
+		    					List<String> data = Files.readAllLines(logfile.toPath());
+								File sumfile = new File(String.format("%s/%s", sumdate, logname));
+								summarize(data, sumfile);
+    						} catch (IOException e) {
+    				            e.printStackTrace();
+    				        }
+    					}
+    				}
+    			}
+    		}
+    	}
     }
 
     @Override
