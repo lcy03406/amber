@@ -733,6 +733,39 @@ public class OptWnd extends Window {
                 }
             }
         });
+        appender.add(new CheckBox("Save barter logs to disk") {
+            {
+                a = Config.bartersave;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("bartersave", val);
+                Config.bartersave = val;
+                a = val;
+            }
+        });
+        appender.add(new CheckBox("Save map tiles to disk") {
+            {
+                a = Config.savemmap;
+            }
+            public void set(boolean val) {
+                Utils.setprefb("savemmap", val);
+                Config.savemmap = val;
+                MapGridSave.mgs = null;
+                a = val;
+            }
+        });
+        appender.add(new CheckBox("Show timestamps in chats") {
+            {
+                a = Config.chattimestamp;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("chattimestamp", val);
+                Config.chattimestamp = val;
+                a = val;
+            }
+        });
         appender.add(new CheckBox("Notify when kin comes online") {
             {
                 a = Config.notifykinonline;

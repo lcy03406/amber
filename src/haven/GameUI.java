@@ -30,6 +30,7 @@ import haven.MapFile.PMarker;
 import haven.automation.ErrorSysMsgCallback;
 import haven.automation.PickForageable;
 import haven.livestock.LivestockManager;
+import haven.res.ui.barterbox.Shopbox;
 import haven.resutil.FoodInfo;
 import integrations.map.RemoteNavigation;
 import integrations.mapv4.MappingClient;
@@ -1494,6 +1495,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
         cmdmap.put("baseq", (cons, args) -> {
             FoodInfo.showbaseq = Utils.parsebool(args[1]);
             msg("q10 FEP values in tooltips are now " + (FoodInfo.showbaseq ? "enabled" : "disabled"));
+        });
+        cmdmap.put("shopsum", (cons, args) -> {
+        	Shopbox.summarize();
         });
     }
 
