@@ -68,7 +68,7 @@ public class HavenPanel extends GLCanvas implements Runnable, Console.Directory 
     public static int w, h;
     public boolean bgmode = false;
     public static long bgfd = Utils.getprefi("bghz", 200);
-    long fd = 10, fps = 0;
+    long fd = 50, fps = 0;
     double uidle = 0.0, ridle = 0.0;
     Queue<InputEvent> events = new LinkedList<InputEvent>();
     private String cursmode = "tex";
