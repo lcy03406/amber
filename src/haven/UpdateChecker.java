@@ -48,6 +48,8 @@ public class UpdateChecker extends Thread {
     }
 
     private boolean isnewer(String currentver, String latestver) {
+    	if (currentver.equals(""))
+    		return false;
         String[] vtokc = currentver.split("[\\.]+");
         int majc = Integer.parseInt(vtokc[0]);
         int minc = Integer.parseInt(vtokc[1]);
