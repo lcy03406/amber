@@ -35,12 +35,11 @@ import haven.WItem;
 import haven.Widget;
 import haven.res.lib.tspec.Spec;
 import haven.res.ui.tt.q.qbuff.QBuff;
+import haven.Config;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
