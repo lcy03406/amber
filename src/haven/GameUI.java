@@ -1142,6 +1142,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
         } else if (ev.isControlDown() && ev.getKeyCode() == Config.zkey) {
             Config.pf = !Config.pf;
             msg("Pathfinding is now turned " + (Config.pf ? "on" : "off"), Color.WHITE);
+            Utils.setprefb("pathfinding", Config.pf);
             return true;
         } else if (ev.isControlDown() && ev.getKeyCode() == KeyEvent.VK_N) {
             Config.daylight = !Config.daylight;
@@ -1187,6 +1188,16 @@ public class GameUI extends ConsoleHost implements Console.Directory {
             return true;
         } else if (ev.isControlDown() && ev.getKeyCode() == KeyEvent.VK_U) {
             TexGL.disableall = !TexGL.disableall;
+            return true;
+        } else if (ev.isControlDown() && ev.getKeyCode() == KeyEvent.VK_TAB) {
+            if (map != null) {
+                map.aggroLastTarget();
+            }
+            return true;
+        } else if (ev.isControlDown() && ev.getKeyCode() == KeyEvent.VK_D) {
+            if (map != null) {
+                map.aggroLastTarget();
+            }
             return true;
         }
         return (super.globtype(key, ev));

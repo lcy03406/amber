@@ -86,6 +86,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     public static final Set<Long> markedGobs = new HashSet<>();
     public static final Material.Colors markedFx = new Material.Colors(new Color(21, 127, 208, 255));
     public Object[] lastItemactClickArgs;
+    public long lastAggroTarget;
 
     public interface Delayed {
         public void run(GOut g);
@@ -1735,6 +1736,55 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         return (new Object[0]);
     }
 
+    private interface GobCheck {
+        boolean check(Gob gob);
+    }
+    
+    private class GobCheckAtk implements GobCheck {
+        public boolean check(Gob gob) {
+            if (gob == null || gob.type == null) {
+                return false;
+            }
+            Gob.Type type = gob.type;
+            switch (type) {
+            case PLAYER:
+                return Config.proximityaggro && !gob.isFriend();
+            case MAMMOTH:
+            case BAT:
+            case EAGLE:
+            case MOB:
+            case BEAR:
+            case LYNX:
+            case TROLL:
+            case WALRUS:
+            case TROUGH:
+                return Config.proximityaggroanimal;
+            case OTHER:
+                return Config.proximityaggroanimal;
+            default:
+                return false;
+            }
+        }
+    }
+
+    private class GobCheckLift implements GobCheck {
+        public boolean check(Gob gob) {
+            //TODO
+            return true;
+        }
+    }
+
+    private class GobCheckChase implements GobCheck {
+        public boolean check(Gob gob) {
+            Resource res = gob.getres();
+            if (res == null)
+                return false;
+            if (res.name.startsWith("gfx/kritter/") || res.name.startsWith("gfx/terobjs/herbs/") || res.name.startsWith("gfx/terobjs/items/"))
+                return true;
+            return false;
+        }
+    }
+
     private class Click extends Hittest {
         int clickb;
 
@@ -1748,6 +1798,21 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                     pfthread.interrupt();
                 }
             }
+        }
+        
+        
+        protected Gob proximity(GobCheck check, Coord2d mc) {
+            Gob target = null;
+            synchronized (glob.oc) {
+                for (Gob gob : glob.oc) {
+                    if (!gob.virtual && !gob.isplayer() && check.check(gob)) {
+                        double dist = gob.rc.dist(mc);
+                        if ((target == null || dist < target.rc.dist(mc)) && dist <= 5 * tilesz.x)
+                            target = gob;
+                    }
+                }
+            }
+            return target;
         }
 
         protected void hit(Coord pc, Coord2d mc, ClickInfo inf) {
@@ -1768,21 +1833,26 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                 }
             }
 
-            if (Config.proximityaggro && clickb == 1 && curs != null && curs.name.equals("gfx/hud/curs/atk")) {
-                Gob target = null;
-                synchronized (glob.oc) {
-                    for (Gob gob : glob.oc) {
-                        if (gob.type == Gob.Type.PLAYER && !gob.isplayer()) {
-                            double dist = gob.rc.dist(mc);
-                            if ((target == null || dist < target.rc.dist(mc)) && dist <= 5 * tilesz.x)
-                                target = gob;
-                        }
-                    }
-                }
+            Gob target = null;
+            if (clickb == 1 && curs != null && curs.name.equals("gfx/hud/curs/atk")
+                    && (Config.proximityaggro || Config.proximityaggroanimal)) {
+                target = proximity(new GobCheckAtk(), mc);
                 if (target != null) {
-                    wdgmsg("click", target.sc, target.rc.floor(posres), 1, 0, 0, (int) target.id, target.rc.floor(posres), 0, -1);
-                    return;
+                    lastAggroTarget = target.id;
                 }
+            }
+            if (clickb == 1 && curs != null && curs.name.equals("gfx/hud/curs/hand")
+                    && (Config.proximitylift)) {
+                target = proximity(new GobCheckLift(), mc);
+            }
+            if (clickb == 3 && (modflags & 4) != 0 && curs != null && curs.name.equals("gfx/hud/curs/arw")
+                    && (Config.proximitychase)) {
+                target = proximity(new GobCheckChase(), mc);
+                modflags = modflags & ~4;
+            }
+            if (target != null) {
+                wdgmsg("click", target.sc, target.rc.floor(posres), clickb, modflags, 0, (int) target.id, target.rc.floor(posres), 0, -1);
+                return;
             }
 
             Object[] args = {pc, mc.floor(posres), clickb, modflags};
@@ -1826,6 +1896,27 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                     wdgmsg("click", args);
                     if (Config.autopickmussels && gob.type == Gob.Type.MUSSEL)
                         startMusselsPicker(gob);
+                }
+            }
+        }
+    }
+    
+    public void aggroLastTarget() {
+        if (lastAggroTarget == 0)
+            return;
+        Gob target = null;
+        synchronized (glob.oc) {
+            for (Gob gob : glob.oc) {
+                if (gob.id == lastAggroTarget) {
+                    gameui().act("aggro");
+                    target = gob;
+                    Object args[] = {target.sc, target.rc.floor(posres), 1, 0, 0, (int) target.id, target.rc.floor(posres), 0, -1};
+                    wdgmsg("click", args);
+                    Gob pl = player();
+                    wdgmsg("click", pl.sc, pl.rc.floor(posres), 3, 0);
+                    String tip = "aggroLastTarget sc=%s rc=%s c=%s m=%s 0=%s id=%s rc=%s 0=%s -1=%s";
+                    gameui().msg(String.format(tip, args), Color.WHITE);
+                    return;
                 }
             }
         }
