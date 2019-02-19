@@ -909,6 +909,17 @@ public class OptWnd extends Window {
                 a = val;
             }
         });
+		//dk
+		appender.add(new CheckBox("Enable localization debug") {
+            {
+                a = Config.enablel10ndebug;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("enablel10ndebug", val);
+                Config.enablel10ndebug = val;
+                a = val;
+            }
         appender.add(new CheckBox("Send food details to the food service (https://food.havenandhearth.link)") {
             {
                 a = Config.foodService;

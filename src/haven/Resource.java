@@ -63,7 +63,8 @@ public class Resource implements Serializable {
     public static final String BUNDLE_ACTION = "action";
     public static final String BUNDLE_INGREDIENT = "ingredient";
     private final static Map<String, Map<String, String>> l10nBundleMap;
-    public static final boolean L10N_DEBUG = System.getProperty("dumpstr") != null;
+    private final static Map<String, Map<String, String>> l10nBundleMapEN;
+    public static final boolean L10N_DEBUG = Utils.getprefb("enablel10ndebug", false);
 
     private Collection<Layer> layers = new LinkedList<Layer>();
     public final String name;
@@ -874,7 +875,21 @@ public class Resource implements Serializable {
                 put(BUNDLE_INGREDIENT, l10n(BUNDLE_INGREDIENT, language));
             }
         }};
-
+//DK
+		l10nBundleMapEN =  new HashMap<String, Map<String, String>>(9) {{
+            if (Resource.L10N_DEBUG) {
+                put(BUNDLE_TOOLTIP, l10n(BUNDLE_TOOLTIP, language));
+                put(BUNDLE_PAGINA, l10n(BUNDLE_PAGINA, language));
+                put(BUNDLE_WINDOW, l10n(BUNDLE_WINDOW, language));
+                put(BUNDLE_BUTTON, l10n(BUNDLE_BUTTON, language));
+                put(BUNDLE_FLOWER, l10n(BUNDLE_FLOWER, language));
+                put(BUNDLE_MSG, l10n(BUNDLE_MSG, language));
+                put(BUNDLE_LABEL, l10n(BUNDLE_LABEL, language));
+                put(BUNDLE_ACTION, l10n(BUNDLE_ACTION, language));
+                put(BUNDLE_INGREDIENT, l10n(BUNDLE_INGREDIENT, language));
+            }
+        }};
+	//DK	
         for (Class<?> cl : dolda.jglob.Loader.get(LayerName.class).classes()) {
             String nm = cl.getAnnotation(LayerName.class).value();
             if (LayerFactory.class.isAssignableFrom(cl)) {
@@ -1810,6 +1825,7 @@ public class Resource implements Serializable {
             }
 
             Map<String, String> map = l10nBundleMap.get(bundle);
+			Map<String, String> mapEN = l10nBundleMapEN.get(bundle);//DK
 
             if (bundle.equals(BUNDLE_TOOLTIP) &&
                     (key.startsWith("paginae/act") || key.startsWith("paginae/bld")
@@ -1832,24 +1848,24 @@ public class Resource implements Serializable {
             
             if (bundle == BUNDLE_LABEL) {
                 for (String s : fmtLocStringsLabel) {
-                    if (fmtLocString(map, key, s) != null)
+                    if (fmtLocString(mapEN, key, s) != null)//dk
                         return;
                 }
             } else if (bundle == BUNDLE_FLOWER) {
                 for (String s : fmtLocStringsFlower) {
-                    if (fmtLocString(map, key, s) != null)
+                    if (fmtLocString(mapEN, key, s) != null)//dk
                         return;
                 }
             } else if (bundle == BUNDLE_MSG) {
                 for (String s : fmtLocStringsMsg) {
-                    if (fmtLocString(map, key, s) != null)
+                    if (fmtLocString(mapEN, key, s) != null)//dk
                         return;
                 }
             }
 
             val = sanitizeVal(val);
 
-            String valOld = map.get(key);
+            String valOld = mapEN.get(key);//dk
             if (valOld != null && sanitizeVal(valOld).equals(val))
                 return;
 
@@ -1860,7 +1876,7 @@ public class Resource implements Serializable {
             encoder.onUnmappableCharacter(CodingErrorAction.REPORT);
             BufferedWriter out = null;
             try {
-                map.put(key, val);
+                mapEN.put(key, val);//DK
                 key = key.replace(" ", "\\ ").replace(":", "\\:").replace("=", "\\=").replace("\n", "\\n");
                 if (key.startsWith("\\ "))
                     key = "\\u0020" + key.substring(2);
