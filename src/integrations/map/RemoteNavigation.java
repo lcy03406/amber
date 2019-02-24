@@ -475,7 +475,7 @@ public class RemoteNavigation {
                         connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
                         connection.setDoOutput(true);
                         try (OutputStream outputStream = connection.getOutputStream()) {
-                            Collection collection = loadedMarkers.stream()
+                            Collection<Object> collection = loadedMarkers.stream()
                                     .map(MarkerData::dataToSend).collect(Collectors.toCollection(ArrayList::new));
                             String json = new JSONArray(collection).toString();
                             outputStream.write(json.getBytes(StandardCharsets.UTF_8));

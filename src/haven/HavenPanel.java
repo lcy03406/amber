@@ -248,6 +248,7 @@ public class HavenPanel extends GLCanvas implements Runnable, Console.Directory,
     public void init() {
         setFocusTraversalKeysEnabled(false);
         newui(null);
+        enableInputMethods(false);
         addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 synchronized (events) {

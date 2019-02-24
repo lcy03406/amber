@@ -146,6 +146,7 @@ public class TextEntry extends SIWidget {
     public TextEntry(int w, String deftext) {
         super(new Coord(w, mext.getHeight()));
         rsettext(deftext);
+        setcanim(true);
         setcanfocus(true);
     }
 

@@ -931,6 +931,7 @@ public class OptWnd extends Window {
                 Config.enablel10ndebug = val;
                 a = val;
             }
+		});
         appender.add(new CheckBox("Send food details to the food service (https://food.havenandhearth.link)") {
             {
                 a = Config.foodService;

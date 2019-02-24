@@ -605,6 +605,7 @@ public class ChatUI extends Widget {
 
         public EntryChannel(boolean closable) {
             super(closable);
+            setcanim(true);
             setfocusctl(true);
             this.in = new TextEntry(0, "") {
                 public void activate(String text) {

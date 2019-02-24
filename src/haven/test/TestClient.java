@@ -168,4 +168,8 @@ public class TestClient implements Runnable, UI.Context {
     public String toString() {
         return ("Client " + user);
     }
+
+	@Override
+	public void enableInputMethods(boolean im) {
+	}
 }

@@ -65,6 +65,7 @@ public class UI {
 
     public interface Context {
         void setmousepos(Coord c);
+		void enableInputMethods(boolean im);
     }
 
     public interface AfterDraw {
@@ -487,4 +488,8 @@ public class UI {
     public void destroy() {
         audio.clear();
     }
+
+	public void enableInputMethods(boolean im) {
+		uictx.enableInputMethods(im);
+	}
 }

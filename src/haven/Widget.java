@@ -39,6 +39,7 @@ public class Widget {
     public boolean focustab = false, focusctl = false, hasfocus = false, visible = true;
     private boolean attached = false;
     private boolean canfocus = false, autofocus = false;
+    public boolean im = false;
     public boolean canactivate = false, cancancel = false;
     public Widget focused;
     public Indir<Resource> cursor = null;
@@ -494,6 +495,7 @@ public class Widget {
     }
 
     public void gotfocus() {
+        ui.enableInputMethods(im);
         if (focusctl && (focused != null)) {
             focused.hasfocus = true;
             focused.gotfocus();
@@ -553,6 +555,10 @@ public class Widget {
         } else {
             parent.setfocus(w);
         }
+    }
+    
+    public void setcanim(boolean can) {
+    	this.im = can;
     }
 
     public void setcanfocus(boolean canfocus) {
