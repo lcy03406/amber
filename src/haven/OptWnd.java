@@ -288,6 +288,17 @@ public class OptWnd extends Window {
                         a = val;
                     }
                 });
+                appender.add(new CheckBox("Unhide crops near the player") {
+                    {
+                        a = Config.unhidenearcrops;
+                    }
+
+                    public void set(boolean val) {
+                        Utils.setprefb("unhidenearcrops", val);
+                        Config.unhidenearcrops = val;
+                        a = val;
+                    }
+                });
                 appender.add(new CheckBox("Show FPS") {
                     {
                         a = Config.showfps;

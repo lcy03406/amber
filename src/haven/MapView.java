@@ -653,10 +653,14 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
             return (false);
         }
     };
-
+    
+    //if ((dreca == null || 
     void addgob(RenderList rl, final Gob gob) {
-        if (Config.hidecrops && gob.type != null && gob.type.has(Gob.Type.PLANT))
-            return;
+    	Coord2d plc = getplc();
+        if (Config.hidecrops && gob.type != null && gob.type.has(Gob.Type.PLANT)) {
+        	if (!Config.unhidenearcrops || gob.rc.dist(plc) > 200)
+            	return;
+        }
 
         GLState xf;
         try {
@@ -1042,6 +1046,14 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
             return (pl.getc());
         else
             return(glob.map.getzp(cc));
+    }
+    
+    public Coord2d getplc() {
+        Gob pl = player();
+        if (pl != null)
+            return (pl.rc);
+        else
+            return(cc);
     }
 
     public static class ClickContext extends RenderContext {
