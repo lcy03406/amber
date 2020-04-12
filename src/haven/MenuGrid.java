@@ -648,6 +648,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
                             Resource res = pag.res.get();
                             if (res.name.equals("ui/tt/q/quality") || res.name.equals("gfx/fx/msrad"))
                                 continue;
+                            gameui().fbelt.loadFromMenu(res.name, res);
                         } catch (Loading l) {
                         }
 

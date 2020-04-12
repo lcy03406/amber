@@ -1,20 +1,26 @@
 package haven;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import static haven.Inventory.invsq;
 
 public class FBelt extends Widget implements DTarget, DropTarget {
-    private final int beltkeys[] = {KeyEvent.VK_F1, KeyEvent.VK_F2, KeyEvent.VK_F3, KeyEvent.VK_F4,
+    private static final int beltkeys[] = {KeyEvent.VK_F1, KeyEvent.VK_F2, KeyEvent.VK_F3, KeyEvent.VK_F4,
             KeyEvent.VK_F5, KeyEvent.VK_F6, KeyEvent.VK_F7, KeyEvent.VK_F8,
             KeyEvent.VK_F9, KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12};
+    private static final int beltmods[] = {0, InputEvent.SHIFT_MASK, InputEvent.ALT_MASK};
+    private static final String belttext[] = {"F", "S", "A"};
+    private static final int SLOT_COUNT = beltkeys.length;
+    private static final int BELT_COUNT = beltmods.length;
+    private static final int SLOT_TOTAL = SLOT_COUNT*BELT_COUNT;
     @SuppressWarnings("unchecked")
-    private GameUI.BeltSlot[] belt = new GameUI.BeltSlot[12];
+    private GameUI.BeltSlot[] belt = new GameUI.BeltSlot[SLOT_TOTAL];
     private UI.Grab dragging;
     private Coord dc;
-    private static final Coord vsz = new Coord(34, 450);
-    private static final Coord hsz = new Coord(450, 34);
+    private static final Coord vsz = new Coord(34+38*(BELT_COUNT-1), 450);
+    private static final Coord hsz = new Coord(450, 34+38*(BELT_COUNT-1));
     private boolean vertical;
     private String chrid;
     private static final int SERVER_FSLOT_INDEX = 132;
@@ -30,13 +36,26 @@ public class FBelt extends Widget implements DTarget, DropTarget {
         if (chrid != "") {
             String[] resnames = Utils.getprefsa("fbelt_" + chrid, null);
             if (resnames != null) {
-                for (int i = 0; i < 12; i++) {
+                for (int i = 0; i < resnames.length && i < SLOT_TOTAL; i++) {
                     String resname = resnames[i];
-                    if (!resname.equals("null")) {
+                    if (!resname.equals("null") && resname.startsWith("paginae/amber")) {
                         try {
-                            belt[i] = ((GameUI)parent).new BeltSlot(i, Resource.local().load(resname), Message.nil);
+                            belt[i] = gameui().new BeltSlot(i, Resource.local().load(resname), Message.nil);
                         } catch (Exception e) {   // possibly a resource from another client
                         }
+                    }
+                }
+            }
+        }
+    }
+    
+    public void loadFromMenu(String resname, Resource res) {
+        if (chrid != "") {
+            String[] resnames = Utils.getprefsa("fbelt_" + chrid, null);
+            if (resnames != null) {
+                for (int i = 0; i < resnames.length && i < SLOT_TOTAL; i++) {
+                    if (resname.equals(resnames[i])) {
+                        belt[i] = gameui().new BeltSlot(i, res.indir(), Message.nil);
                     }
                 }
             }
@@ -46,11 +65,19 @@ public class FBelt extends Widget implements DTarget, DropTarget {
     private void saveLocally() {
         String chrid = gameui().chrid;
         if (chrid != "") {
-            String[] resnames = new String[12];
-            for (int i = 0; i < 12; i++) {
+            String[] resnames = new String[SLOT_TOTAL];
+            for (int i = 0; i < SLOT_COUNT; i++) {
                 try {
                     GameUI.BeltSlot res = belt[i];
                     if (res != null && res.getres().name.startsWith("paginae/amber"))
+                        resnames[i] = res.getres().name;
+                } catch (Exception e) {
+                }
+            }
+            for (int i = SLOT_COUNT; i < SLOT_TOTAL; i++) {
+                try {
+                    GameUI.BeltSlot res = belt[i];
+                    if (res != null && res.getres() != null)
                         resnames[i] = res.getres().name;
                 } catch (Exception e) {
                 }
@@ -60,13 +87,15 @@ public class FBelt extends Widget implements DTarget, DropTarget {
     }
 
     private Coord beltc(int i) {
+        int b = i / SLOT_COUNT;
+        int s = i % SLOT_COUNT;
         if (vertical)
-            return new Coord(0, ((invsq.sz().x + 2) * i) + (10 * (i / 4)));
-        return new Coord(((invsq.sz().x + 2) * i) + (10 * (i / 4)), 0);
+            return new Coord(b*38, ((invsq.sz().x + 2) * s) + (10 * (s / 4)));
+        return new Coord(((invsq.sz().x + 2) * s) + (10 * (s / 4)), b*38);
     }
 
     private int beltslot(Coord c) {
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < SLOT_TOTAL; i++) {
             if (c.isect(beltc(i), invsq.sz()))
                 return i;
         }
@@ -75,7 +104,7 @@ public class FBelt extends Widget implements DTarget, DropTarget {
 
     @Override
     public void draw(GOut g) {
-        for (int slot = 0; slot < 12; slot++) {
+        for (int slot = 0; slot < SLOT_TOTAL; slot++) {
             Coord c = beltc(slot);
             g.image(invsq, c);
             try {
@@ -88,7 +117,9 @@ public class FBelt extends Widget implements DTarget, DropTarget {
                 belt[slot] = null;
             }
             g.chcolor(keysClr);
-            FastText.aprint(g, new Coord(c.x + invsq.sz().x - 2, c.y + invsq.sz().y), 1, 1, "F" + (slot + 1));
+            int b = slot / SLOT_COUNT;
+            int s = slot % SLOT_COUNT;
+            FastText.aprint(g, new Coord(c.x + invsq.sz().x - 2, c.y + invsq.sz().y), 1, 1, belttext[b] + (s + 1));
             g.chcolor();
         }
     }
@@ -157,11 +188,16 @@ public class FBelt extends Widget implements DTarget, DropTarget {
     public boolean globtype(char key, KeyEvent ev) {
         if (key != 0)
             return false;
-        for (int i = 0; i < beltkeys.length; i++) {
-            if (ev.getKeyCode() == beltkeys[i]) {
-                if (belt[i] != null)
-                    use(i);
-                return true;
+        for (int m = 0; m < beltmods.length; m++) {
+            if (ev.getModifiers() == beltmods[m]) {
+                for (int i = 0; i < beltkeys.length; i++) {
+                    if (ev.getKeyCode() == beltkeys[i]) {
+                        int s = m*SLOT_COUNT + i;
+                        if (belt[s] != null)
+                            use(s);
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -194,7 +230,7 @@ public class FBelt extends Widget implements DTarget, DropTarget {
                 Resource res = (Resource) thing;
                 if (res.layer(Resource.action) != null) {
                     belt[slot] = this.gameui().new BeltSlot(slot, res.indir(), Message.nil);
-                    if (res.name.startsWith("paginae/amber"))
+                    if (slot >= SLOT_COUNT || res.name.startsWith("paginae/amber"))
                         saveLocally();
                     else
                         gameui().wdgmsg("setbelt", getServerSlot(slot), res.name);

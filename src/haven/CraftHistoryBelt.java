@@ -3,12 +3,12 @@ package haven;
 import static haven.Inventory.invsq;
 
 public class CraftHistoryBelt extends Widget {
-    private static final int SIZE = 8;
+    private static final int SIZE = 20;
     private MenuGrid.Pagina[] belt = new MenuGrid.Pagina[SIZE];
     private UI.Grab dragging;
     private Coord dc;
-    private static final Coord vsz = new Coord(34, 450);
-    private static final Coord hsz = new Coord(450, 34);
+    private static final Coord vsz = new Coord(34, 36*SIZE);
+    private static final Coord hsz = new Coord(36*SIZE, 34);
     private boolean vertical;
 
     public CraftHistoryBelt(boolean vertical) {
