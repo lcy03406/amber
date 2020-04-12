@@ -111,7 +111,7 @@ public class FlowerMenu extends Widget {
                 if (s == 1.0) {
                     CheckListboxItem itm = Config.flowermenus.get(p.name);
                     if (itm != null && itm.selected && !ui.modmeta && (!ignoreAutoSetting || p.name.equals("Peer into")) ||
-                            p.name.equals(nextAutoSel) && System.currentTimeMillis() - nextAutoSelTimeout < 2000) {
+                            p.name.equals(nextAutoSel) && System.currentTimeMillis() - nextAutoSelTimeout < 3000) {
                         nextAutoSel = null;
                         choose(p);
                         break;

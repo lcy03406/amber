@@ -128,4 +128,18 @@ public class Utils {
         }
         return null;
     }
+
+    public static WItem findItemByMatchInInv(Inventory inv, String resNamePattern) {
+        for (Widget wdg = inv.child; wdg != null; wdg = wdg.next) {
+            if (wdg instanceof WItem) {
+                WItem witm = ((WItem) wdg);
+                try {
+                    if (witm.item.getres().name.matches(resNamePattern))
+                        return witm;
+                } catch (Loading l) {
+                }
+            }
+        }
+        return null;
+    }
 }
