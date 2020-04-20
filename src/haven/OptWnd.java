@@ -299,6 +299,17 @@ public class OptWnd extends Window {
                         a = val;
                     }
                 });
+                appender.add(new CheckBox("straight cave wall") {
+                    {
+                        a = Config.straightcavewall;
+                    }
+
+                    public void set(boolean val) {
+                        Utils.setprefb("straightcavewall", val);
+                        Config.straightcavewall = val;
+                        a = val;
+                    }
+                });
                 appender.add(new CheckBox("Show FPS") {
                     {
                         a = Config.showfps;
