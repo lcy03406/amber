@@ -91,7 +91,7 @@ public class HavenPanel extends GLCanvas implements Runnable, Console.Directory,
             setContextCreationFlags(getContextCreationFlags() | GLContext.CTX_OPTION_DEBUG);
         setSize(this.w = w, this.h = h);
         newui(null);
-        RemoteNavigation.getInstance();
+        if (Config.mapperEnabled) RemoteNavigation.getInstance();
         MappingClient.getInstance();
         initgl();
         if (Toolkit.getDefaultToolkit().getMaximumCursorColors() >= 256 || Config.hwcursor)

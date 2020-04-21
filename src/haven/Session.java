@@ -613,7 +613,7 @@ public class Session implements Resource.Resolver {
         sworker.start();
         ticker = new Ticker();
         ticker.start();
-        Navigation.reset();
+        if (Config.mapperEnabled) Navigation.reset();
     }
 
     private void sendack(int seq) {

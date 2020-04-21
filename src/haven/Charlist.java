@@ -142,7 +142,7 @@ public class Charlist extends Widget {
                 for (Char c : chars) {
                     if (sender == c.plb) {
                         wdgmsg("play", c.name);
-                        Navigation.setCharacterName(c.name);
+                        if (Config.mapperEnabled) Navigation.setCharacterName(c.name);
                         MappingClient.getInstance().SetPlayerName(c.name);
                     }
                 }

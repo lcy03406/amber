@@ -155,14 +155,16 @@ public class MinimapWnd extends Widget {
                         return;
                     }
                 }
-                Coord gridCoord = null;
-                if (this.locatedAC != null) {
-                    gridCoord = this.locatedAC.toGridCoordinate();
-                } else if (this.detectedAC != null) {
-                    gridCoord = this.detectedAC.toGridCoordinate();
-                }
-                if (gridCoord != null) {
-                    RemoteNavigation.getInstance().openBrowserMap(gridCoord);
+                if (Config.mapperEnabled) {
+                    Coord gridCoord = null;
+                    if (this.locatedAC != null) {
+                        gridCoord = this.locatedAC.toGridCoordinate();
+                    } else if (this.detectedAC != null) {
+                        gridCoord = this.detectedAC.toGridCoordinate();
+                    }
+                    if (gridCoord != null ) {
+                        RemoteNavigation.getInstance().openBrowserMap(gridCoord);
+                    }
                 }
             }
 
@@ -170,17 +172,19 @@ public class MinimapWnd extends Widget {
             public void draw(GOut g) {
                 boolean redraw = false;
 
-                Coord2d locatedAC = Navigation.getAbsoluteCoordinates();
-                if (state != 2 && locatedAC != null) {
-                    this.locatedAC = locatedAC;
-                    state = 2;
-                    redraw = true;
-                }
-                Coord2d detectedAC = Navigation.getDetectedAbsoluteCoordinates();
-                if (state != 1 && detectedAC != null) {
-                    this.detectedAC = detectedAC;
-                    state = 1;
-                    redraw = true;
+                if (Config.mapperEnabled) {
+                    Coord2d locatedAC = Navigation.getAbsoluteCoordinates();
+                    if (state != 2 && locatedAC != null) {
+                        this.locatedAC = locatedAC;
+                        state = 2;
+                        redraw = true;
+                    }
+                    Coord2d detectedAC = Navigation.getDetectedAbsoluteCoordinates();
+                    if (state != 1 && detectedAC != null) {
+                        this.detectedAC = detectedAC;
+                        state = 1;
+                        redraw = true;
+                    }
                 }
                 if (Config.vendanMapv4) {
                     MapRef mr = MappingClient.getInstance().lastMapRef;

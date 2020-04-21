@@ -145,7 +145,7 @@ public class Navigation {
 
     static synchronized void recalculateAbsoluteCoordinates() {
         Long gridId = virtualGridsCache.get(lastPlayerCoordinates.toGridCoordinate());
-        if (gridId != null) {
+        if (gridId != null && Config.mapperEnabled) {
             Coord gridCoord = RemoteNavigation.getInstance().locateGridCoordinates(gridId);
             if (gridCoord != null) {
                 absoluteCoordinates = lastPlayerCoordinates.gridOffset().add(gridCoord.mul(1100));
@@ -182,7 +182,7 @@ public class Navigation {
                     }
                     sessionPartyCoordinates.clear();
                 }
-                if (isValidGridType(sessionType)) {
+                if (Config.mapperEnabled && isValidGridType(sessionType)) {
                     RemoteNavigation.getInstance().setCharacterGrid(gridId, gridCoordinate, null);
                 }
             }
@@ -224,7 +224,7 @@ public class Navigation {
         characterId = -1;
         sessionPartyCoordinates.clear();
         virtualGridsCache.clear();
-        RemoteNavigation.getInstance().removeAllGrids();
+        if (Config.mapperEnabled) RemoteNavigation.getInstance().removeAllGrids();
     }
 
     public static Coord2d getAbsoluteCoordinates() {
