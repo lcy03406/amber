@@ -290,6 +290,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
         });
         Debug.log = ui.cons.out;
         opts.c = sz.sub(opts.sz).div(2);
+        HavenPanel.beetbox.newgameui(this);
     }
 
     public class Hidepanel extends Widget {
@@ -869,10 +870,15 @@ public class GameUI extends ConsoleHost implements Console.Directory {
             }
             msg(text);
         } else if (msg == "prog") {
-            if (args.length > 0)
+            if (args.length > 0) {
+                if (prog == -1) {
+                    BeetBox.event("ProgStart");
+                }
                 prog = ((Number) args[0]).doubleValue() / 100.0;
-            else
+            } else {
                 prog = -1;
+                BeetBox.event("ProgStop");
+            }
         } else if (msg == "setbelt") {
             int slot = (Integer) args[0];
             if (args.length < 2) {

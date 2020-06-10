@@ -931,8 +931,18 @@ public class OptWnd extends Window {
                 a = val;
             }
         });
-		//dk
-		appender.add(new CheckBox("Enable localization debug") {
+        appender.add(new CheckBox("Write message log") {
+            {
+                a = Config.msglog;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("msglog", val);
+                Config.msglog = val;
+                a = val;
+            }
+        });		//dk
+        appender.add(new CheckBox("Enable localization debug") {
             {
                 a = Config.enablel10ndebug;
             }
@@ -942,7 +952,7 @@ public class OptWnd extends Window {
                 Config.enablel10ndebug = val;
                 a = val;
             }
-		});
+        });
         appender.add(new CheckBox("Send food details to the food service (https://food.havenandhearth.link)") {
             {
                 a = Config.foodService;
@@ -1093,6 +1103,17 @@ public class OptWnd extends Window {
             public void set(boolean val) {
                 Utils.setprefb("proximitylift", val);
                 Config.proximitylift = val;
+                a = val;
+            }
+        });
+       appender.add(new CheckBox("Automatically give up") {
+            {
+                a = Config.autogive;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("autogive", val);
+                Config.autogive = val;
                 a = val;
             }
         });

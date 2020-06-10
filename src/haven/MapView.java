@@ -1599,8 +1599,10 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                     odt = Message.nil;
                 placing.ols.add(new Gob.Overlay(-1, ores, odt));
             }
+            BeetBox.event("PlaceStart", res);
         } else if (msg == "unplace") {
             placing = null;
+            BeetBox.event("PlaceStop");
         } else if (msg == "move") {
             cc = ((Coord)args[0]).mul(posres);
         } else if (msg == "plob") {
@@ -1902,7 +1904,8 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                             }
                         }
                     }
-                }
+                    BeetBox.event("MapSelect", gob);
+                } else 
 
                 if (Config.pf && curs != null && !curs.name.equals("gfx/hud/curs/study") && gob != null) {
                     pfRightClick(gob, (int)args[8], clickb, 0, null);
@@ -2340,6 +2343,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                         areaselcb.areaselect(ol.getc1(), ol.getc2());
                     wdgmsg("sel", sc, ec, modflags);
                     sc = null;
+                    BeetBox.event("MapArea", ol.getc1(), ol.getc2());
                 }
                 return (true);
             }

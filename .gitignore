@@ -6,6 +6,8 @@
 *.iml
 *.zip
 amber-*.zip
+amber-*/
+run.bat.lnk
 /l10n/*_new.properties
 /bin
 /.settings

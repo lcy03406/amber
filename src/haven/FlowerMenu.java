@@ -29,6 +29,7 @@ package haven;
 import java.awt.Color;
 
 import static java.lang.Math.PI;
+import java.util.Arrays;
 
 public class FlowerMenu extends Widget {
     public static final Color pink = new Color(255, 0, 128);
@@ -187,6 +188,7 @@ public class FlowerMenu extends Widget {
             if (options[i].equals("Study") || options[i].equals("Turn"))    // eatable curios & spitroasting
                 ignoreAutoSetting = true;
         }
+        BeetBox.event("FlowerMenu", this, Arrays.asList(options));
     }
 
     protected void added() {

@@ -40,6 +40,8 @@ import java.text.AttributedCharacterIterator.Attribute;
 import java.net.URL;
 import java.util.regex.*;
 import java.awt.datatransfer.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ChatUI extends Widget {
     private static final Resource alarmsfx = Resource.local().loadwait("sfx/chatalarm");
@@ -653,7 +655,14 @@ public class ChatUI extends Widget {
 
         public void send(String text) {
             history.add(text);
-            wdgmsg("msg", text);
+            if (text.startsWith(":")) {
+                try {
+                    ui.cons.run(text);
+                } catch (Exception ex) {
+                }
+            } else {
+                wdgmsg("msg", text);
+            }
         }
     }
 

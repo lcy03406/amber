@@ -26,6 +26,7 @@
       	<pathelement path="lib/jogl.jar" />
       	<pathelement path="lib/gluegen-rt.jar" />
       	<pathelement path="lib/jglob.jar" />
+        <pathelement path="lib/groovy-3.0.4.jar" />
       </classpath>
       <compilerarg value="-Xlint:unchecked" />
       <compilerarg value="-Xlint:-options" />
@@ -56,7 +57,7 @@
       <fileset dir="build/classes-lib" />
       <manifest>
 	<attribute name="Main-Class" value="haven.MainFrame" />
-	<attribute name="Class-Path" value="jogl.jar gluegen-rt.jar amber-res.jar builtin-res.jar hafen-res.jar l10n.jar" />
+	<attribute name="Class-Path" value="jogl.jar gluegen-rt.jar amber-res.jar builtin-res.jar hafen-res.jar l10n.jar groovy-3.0.4.jar" />
       </manifest>
     </jar>
     <chmod file="build/hafen.jar" perm="a+x" />
@@ -75,17 +76,24 @@
     </jar>
   </target>
   
-  <target name="jars" depends="build-env, jar, res-jar, l10n-jar">
+  <target name="jars" depends="build-env, jar, res-jar, l10n-jar, beetroot">
     <copy todir="build">
       <fileset dir="lib">
-	<include name="jogl.jar" />
-	<include name="gluegen-rt.jar" />
-	<include name="hafen-res.jar" />
-	<include name="builtin-res.jar" />
-	<include name="amber-res.jar" />
+        <include name="jogl.jar" />
+        <include name="gluegen-rt.jar" />
+        <include name="hafen-res.jar" />
+        <include name="builtin-res.jar" />
+        <include name="amber-res.jar" />
+        <include name="groovy-3.0.4.jar" />
       </fileset>
       <fileset dir="lib/jogl-natives" includes="*.jar">
       </fileset>
+    </copy>
+  </target>
+  
+  <target name="beetroot">
+    <copy todir="build">
+      <fileset dir="" includes="beetroot/" />
     </copy>
   </target>
 
@@ -105,7 +113,7 @@
   <target name="deftgt" depends="jars" />
 
   <target name="run" depends="jars">
-    <java jar="build/hafen.jar" fork="true" />
+    <java jar="build/hafen.jar" fork="true" classpath="lib/" args="-U https://game.havenandhearth.com/hres/ game.havenandhearth.com" />
   </target>
   
   <target name="clean">

@@ -77,7 +77,9 @@ public class Inventory extends Widget implements DTarget {
         Coord c = (Coord) args[0];
         if (child instanceof GItem) {
             GItem i = (GItem) child;
-            wmap.put(i, add(new WItem(i), c.mul(sqsz).add(1, 1)));
+            WItem wi = new WItem(i);
+            wmap.put(i, add(wi, c.mul(sqsz).add(1, 1)));
+            BeetBox.event("ItemAdd", this, wi);
         }
     }
 
@@ -85,7 +87,9 @@ public class Inventory extends Widget implements DTarget {
         super.cdestroy(w);
         if (w instanceof GItem) {
             GItem i = (GItem) w;
-            ui.destroy(wmap.remove(i));
+            WItem wi = wmap.remove(i);
+            BeetBox.event("ItemDel", this, wi);
+            ui.destroy(wi);
         }
     }
 

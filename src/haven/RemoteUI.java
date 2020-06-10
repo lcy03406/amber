@@ -26,6 +26,8 @@
 
 package haven;
 
+import java.util.Arrays;
+
 public class RemoteUI implements UI.Receiver, UI.Runner {
     Session sess, ret;
     UI ui;

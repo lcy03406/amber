@@ -151,6 +151,9 @@ public class UI {
     }
 
     public void newwidget(int id, String type, int parent, Object[] pargs, Object... cargs) throws InterruptedException {
+        if (Config.msglog) {
+            System.err.printf("newwdg %d:%s@%d pargs=%s cargs=%s\n", id, type, parent, Arrays.toString(pargs), Arrays.toString(cargs));
+        }
         if (Config.quickbelt && type.equals("wnd") && cargs[1].equals("Belt")) {
             // use custom belt window
             type = "wnd-belt";
@@ -209,6 +212,9 @@ public class UI {
             Widget pwdg = widgets.get(parent);
             if(pwdg == null)
                 throw(new UIException("Null parent widget " + parent + " for " + id, null, pargs));
+            if (Config.msglog) {
+                System.err.printf("addwdg %d:%s %d:%s pargs=%s\n", id, shortClass(wdg), parent, shortClass(pwdg), Arrays.toString(pargs));
+            }
             pwdg.addchild(wdg, pargs);
         }
     }
@@ -332,9 +338,20 @@ public class UI {
         synchronized (this) {
             if (widgets.containsKey(id)) {
                 Widget wdg = widgets.get(id);
+                if (Config.msglog) {
+                    System.err.printf("dstwdg %d:%s\n", id, shortClass(wdg));
+                }
                 destroy(wdg);
             }
         }
+    }
+    
+    static String shortClass(Widget w) {
+        String cl = w.getClass().getName().replace("haven.", "");
+        if (w.parent != null) {
+            cl = cl + "@" + w.parent.getClass().getName().replace("haven.", "");
+        }
+        return cl;
     }
 
     public void wdgmsg(Widget sender, String msg, Object... args) {
@@ -344,21 +361,45 @@ public class UI {
                 return;
 
             if(!rwidgets.containsKey(sender)) {
-                System.err.printf("Wdgmsg sender (%s) is not in rwidgets, message is %s\n", sender.getClass().getName(), msg);
+                System.err.printf("Wdgmsg sender (%s) is not in rwidgets, message is %s\n", shortClass(sender), msg);
                 return;
             }
             id = rwidgets.get(sender);
         }
-        if(rcvr != null)
+        if(rcvr != null) {
+            if (Config.msglog) {
+                System.err.printf("wdgmsg %d:%s msg=%s args=%s\n", id, shortClass(sender), msg, Arrays.toString(args));
+            }
             rcvr.rcvmsg(id, msg, args);
+        }
+    }
+    
+    final static private Class[][] hideMsgClass = {
+        {GItem.class, InventoryStudy.class},
+        {CharWnd.class, null},
+        {IMeter.class, GameUI.Hidepanel.class},
+    };
+    
+    public static boolean enableMsgLog(Widget wdg) {
+        Class c0 = wdg.getClass();
+        Class c1 = wdg.parent == null ? null : wdg.parent.getClass();
+        for (Class[] c : hideMsgClass) {
+            if ((c[0] == null || c[0] == c0) && (c[1] == null || c[1] == c1)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void uimsg(int id, String msg, Object... args) {
         synchronized (this) {
             Widget wdg = widgets.get(id);
-            if (wdg != null)
+            if (wdg != null) {
+                if (Config.msglog && enableMsgLog(wdg)) {
+                    System.err.printf("uimsg %d:%s msg=%s args=%s\n", id, shortClass(wdg), msg, Arrays.toString(args));
+                }
                 wdg.uimsg(msg.intern(), args);
-            else
+            } else
                 throw (new UIException("Uimsg to non-existent widget " + id, msg, args));
         }
     }

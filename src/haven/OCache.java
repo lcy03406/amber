@@ -88,6 +88,7 @@ public class OCache implements Iterable<Gob> {
                 old.dispose();
                 for(ChangeCallback cb : cbs)
                     cb.removed(old);
+                BeetBox.gobevent("Remove", old, id);
             }
         }
     }
@@ -173,6 +174,7 @@ public class OCache implements Iterable<Gob> {
             } else {
                 Gob g = new Gob(glob, Coord2d.z, id, frame);
                 objs.put(id, g);
+                BeetBox.gobevent("Create", g);
                 return (g);
             }
         } else {
@@ -244,6 +246,7 @@ public class OCache implements Iterable<Gob> {
         if (lm == null || !lm.s.equals(s) || !lm.v.equals(v)) {
             g.setattr(new LinMove(g, s, v));
             changed(g);
+            BeetBox.gobevent("MoveStart", g, s, v);
         }
     }
 
@@ -259,9 +262,10 @@ public class OCache implements Iterable<Gob> {
         if (m == null || !(m instanceof LinMove))
             return;
         LinMove lm = (LinMove) m;
-        if (t < 0)
+        if (t < 0) {
             g.delattr(Moving.class);
-        else
+            BeetBox.gobevent("MoveStop", g);
+        } else
             lm.sett(t);
 
         if (e >= 0)
@@ -317,6 +321,7 @@ public class OCache implements Iterable<Gob> {
             g.setattr(cmp);
         }
         changed(g);
+        BeetBox.gobevent("Composite", g, base);
     }
 
     public void composite(Gob gob, Message msg) {
@@ -335,6 +340,7 @@ public class OCache implements Iterable<Gob> {
                 cmp.tposes(tposes, WrapMode.ONCE, ttime);
         }
         changed(g);
+        BeetBox.gobevent("CmpPose", g, poses, interp);
     }
 
     public void cmppose(Gob gob, Message msg) {
@@ -380,6 +386,7 @@ public class OCache implements Iterable<Gob> {
         Composite cmp = (Composite) g.getattr(Drawable.class);
         cmp.chmod(mod);
         changed(g);
+        BeetBox.gobevent("CmpMod", g, mod);
     }
 
     public void cmpmod(Gob gob, Message msg) {
@@ -414,6 +421,7 @@ public class OCache implements Iterable<Gob> {
         Composite cmp = (Composite) g.getattr(Drawable.class);
         cmp.chequ(equ);
         changed(g);
+        BeetBox.gobevent("CmpEqu", g, equ);
     }
 
     public void cmpequ(Gob gob, Message msg) {
@@ -508,11 +516,13 @@ public class OCache implements Iterable<Gob> {
     public synchronized void follow(Gob g, long oid, Indir<Resource> xfres, String xfname) {
         if (oid == 0xffffffffl) {
             g.delattr(Following.class);
+            BeetBox.gobevent("FollowStop", g);
         } else {
             Following flw = g.getattr(Following.class);
             if (flw == null) {
                 flw = new Following(g, oid, xfres, xfname);
                 g.setattr(flw);
+                BeetBox.gobevent("FollowStart", g, oid, xfres, xfname);
             } else {
                 synchronized (flw) {
                     flw.tgt = oid;
@@ -547,6 +557,7 @@ public class OCache implements Iterable<Gob> {
         Homing homo = g.getattr(Homing.class);
         if((homo == null) || (homo.tgt != oid)) {
             g.setattr(new Homing(g, oid, tc, v));
+            BeetBox.gobevent("Homing", g, oid, tc, v);
         } else {
             homo.tc = tc;
             homo.v = v;
@@ -573,8 +584,9 @@ public class OCache implements Iterable<Gob> {
             sdt = new MessageBuf(sdt);
             if (ol == null) {
                 g.ols.add(ol = new Gob.Overlay(olid, resid, sdt));
-                if (sdt.rt == 7 && isfight && Config.showdmgop)
+                if (sdt.rt == 7) {
                     setdmgoverlay(g, resid, new MessageBuf(sdt));
+                }
             } else if (!ol.sdt.equals(sdt)) {
                 if (ol.spr instanceof Gob.Overlay.CUpd) {
                     ol.sdt = new MessageBuf(sdt);
@@ -582,8 +594,9 @@ public class OCache implements Iterable<Gob> {
                 } else {
                     g.ols.remove(ol);
                     g.ols.add(ol = new Gob.Overlay(olid, resid, sdt));
-                    if (sdt.rt == 7 && isfight && Config.showdmgop)
+                    if (sdt.rt == 7) {
                         setdmgoverlay(g, resid, new MessageBuf(sdt));
+                    }
                 }
             }
             ol.delign = prs;
@@ -599,13 +612,16 @@ public class OCache implements Iterable<Gob> {
     private void setdmgoverlay(final Gob g, final Indir<Resource> resid, final MessageBuf sdt) {
         final int dmg = sdt.int32();
         // ignore dmg of 1 from scents
-        if (dmg == 1)
-            return;
+        //if (dmg == 1)
+        //    return;
         sdt.uint8();
         final int clr = sdt.uint16();
         if (clr != 61455 /* damage */ && clr != 36751 /* armor damage */)
             return;
 
+        if (!(isfight && Config.showdmgop))
+            return;
+        
         Defer.later(new Defer.Callable<Void>() {
             public Void call() {
                 try {

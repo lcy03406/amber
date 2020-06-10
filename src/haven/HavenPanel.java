@@ -43,10 +43,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.media.opengl.*;
 import javax.media.opengl.awt.*;
+import beetbox.Engine;
 
 public class HavenPanel extends GLCanvas implements Runnable, Console.Directory, UI.Context  {
     UI ui;
     public static UI lui;
+    public static Engine beetbox = Engine.init();
     boolean inited = false;
     public static int w, h;
     public boolean bgmode = false;
@@ -323,6 +325,7 @@ public class HavenPanel extends GLCanvas implements Runnable, Console.Directory,
         if (glconf != null)
             ui.cons.add(glconf);
         lui = ui;
+        beetbox.newui(this, ui, sess);
         return (ui);
     }
 

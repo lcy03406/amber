@@ -176,8 +176,10 @@ public class Config {
     public static boolean proximityaggroanimal = Utils.getprefb("proximityaggroanimal", false);
     public static boolean proximitychase = Utils.getprefb("proximitychase", false);
     public static boolean proximitylift = Utils.getprefb("proximitylift", false);
+    public static boolean autogive = Utils.getprefb("autogive", false);
     public static boolean enablel10ndebug = Utils.getprefb("enablel10ndebug", false);//DK
     public static boolean straightcavewall = Utils.getprefb("straightcavewall", false);
+    public static boolean msglog = Utils.getprefb("straightcavewall", false);
     public static boolean foodService = Utils.getprefb("foodService", false);
     public static boolean pf = false;
     public static String playerposfile;

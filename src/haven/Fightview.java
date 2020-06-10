@@ -84,15 +84,21 @@ public class Fightview extends Widget {
             if (this == current)
                 curgive.state = state;
             this.give.state = state;
+            if (Config.logcombatactions)
+                gameui().syslog.append(String.format("%d: give %d", gobid, state), combatLogOpClr);
         }
 
         public void show(boolean state) {
+            if (Config.logcombatactions)
+                gameui().syslog.append(String.format("%d: show %b", gobid, state), combatLogOpClr);
             ava.show(state);
             give.show(state);
             purs.show(state);
         }
 
         public void remove() {
+            if (Config.logcombatactions)
+                gameui().syslog.append(String.format("%d: remove", gobid), combatLogOpClr);
             ui.destroy(ava);
             ui.destroy(give);
             ui.destroy(purs);
@@ -202,6 +208,8 @@ public class Fightview extends Widget {
             add(curava = new Avaview(Avaview.dasz, rel.gobid, "avacam"), cavac).canactivate = true;
             add(curpurs = new Button(70, "Chase"), cpursc);
             curgive.state = rel.give.state;
+            if (Config.autogive && (curgive.state & 1) == 1 )
+                curgive.wdgmsg("click", 1);
         } else if ((current != null) && (rel == null)) {
             ui.destroy(curgive);
             ui.destroy(curava);

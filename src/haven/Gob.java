@@ -221,6 +221,10 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     public Gob(Glob glob, Coord2d c) {
         this(glob, c, -1, 0);
     }
+    
+    public String toString() {
+        return "Gob" + id;
+    }
 
     public static interface ANotif<T extends GAttrib> {
         public void ch(T n);
@@ -300,6 +304,10 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 
     public Coord3f getrc() {
         return(glob.map.getzp(rc));
+    }
+    
+    public Coord getnc() {
+        return rc.floor(OCache.posres);
     }
 
     public double geta() {
