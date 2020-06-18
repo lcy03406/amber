@@ -274,12 +274,19 @@ public class Widget {
             return (add0(child));
         }
     }
+    
+    private Coord getWindowCoord(Widget child, String cap, Coord sc) {
+        Coord c = Utils.getprefc(cap + "_c", sc);
+        if (c != sc && !c.add(child.sz).isect(Coord.z, sz))
+            return sc;
+        return c;
+    }
 
     public <T extends Widget> T add(T child, Coord c) {
         if (child instanceof Window) {
-            child.c = Utils.getprefc(((Window) child).origcap + "_c", c);
+            child.c = getWindowCoord(child, ((Window) child).origcap, c);
         } else if (child instanceof BeltWnd) {   // FIXME. this is ugly
-            child.c = Utils.getprefc(((BeltWnd) child).origcap + "_c", c);
+            child.c = getWindowCoord(child, ((BeltWnd) child).origcap, c);
         } else {
             child.c = c;
         }
