@@ -1509,10 +1509,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
         cmdmap.put("savemap", (cons, args) -> {
             new Thread(() -> mapfile.view.dumpTiles(), "MapDumper").start();
         });
-        cmdmap.put("baseq", (cons, args) -> {
-            FoodInfo.showbaseq = Utils.parsebool(args[1]);
-            msg("q10 FEP values in tooltips are now " + (FoodInfo.showbaseq ? "enabled" : "disabled"));
-        });
         cmdmap.put("shopsum", (cons, args) -> {
         	Shopbox.summarize();
         });

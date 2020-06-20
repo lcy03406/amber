@@ -37,6 +37,8 @@ import java.util.*;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
 
@@ -74,6 +76,30 @@ public class OptWnd extends Window {
                 return (true);
             }
             return (false);
+        }
+    }
+    
+    public static class ConfBox extends CheckBox {
+        private final String conf;
+        public ConfBox(String label, String conf) {
+            super(label);
+            this.conf = conf;
+            try {
+                a = Config.class.getDeclaredField(conf).getBoolean(null);
+            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                Logger.getLogger(OptWnd.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        @Override
+        public void set(boolean val) {
+            super.set(val);
+            Utils.setprefb(conf, val);
+            try {
+                Config.class.getDeclaredField(conf).setBoolean(null, a);
+            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                Logger.getLogger(OptWnd.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
@@ -192,135 +218,18 @@ public class OptWnd extends Window {
                             },
                             dpy);
                 }
-                appender.add(new CheckBox("Disable biome tile transitions (requires logout)") {
-                    {
-                        a = Config.disabletiletrans;
-                    }
-                    public void set(boolean val) {
-                        Config.disabletiletrans = val;
-                        Utils.setprefb("disabletiletrans", val);
-                        a = val;
-                    }
-                });
-                appender.add(new CheckBox("Disable terrain smoothing (requires logout)") {
-                    {
-                        a = Config.disableterrainsmooth;
-                    }
-                    public void set(boolean val) {
-                        Config.disableterrainsmooth = val;
-                        Utils.setprefb("disableterrainsmooth", val);
-                        a = val;
-                    }
-                });
-                appender.add(new CheckBox("Disable terrain elevation (requires logout)") {
-                    {
-                        a = Config.disableelev;
-                    }
-                    public void set(boolean val) {
-                        Config.disableelev = val;
-                        Utils.setprefb("disableelev", val);
-                        a = val;
-                    }
-                });
-                appender.add(new CheckBox("Disable flavor objects including ambient sounds") {
-                    {
-                        a = Config.hideflocomplete;
-                    }
-
-                    public void set(boolean val) {
-                        Utils.setprefb("hideflocomplete", val);
-                        Config.hideflocomplete = val;
-                        a = val;
-                    }
-                });
-                appender.add(new CheckBox("Hide flavor objects but keep sounds (requires logout)") {
-                    {
-                        a = Config.hideflovisual;
-                    }
-
-                    public void set(boolean val) {
-                        Utils.setprefb("hideflovisual", val);
-                        Config.hideflovisual = val;
-                        a = val;
-                    }
-                });
-                appender.add(new CheckBox("Show weather") {
-                    {
-                        a = Config.showweather;
-                    }
-
-                    public void set(boolean val) {
-                        Utils.setprefb("showweather", val);
-                        Config.showweather = val;
-                        a = val;
-                    }
-                });
-                appender.add(new CheckBox("Simple crops (req. logout)") {
-                    {
-                        a = Config.simplecrops;
-                    }
-
-                    public void set(boolean val) {
-                        Utils.setprefb("simplecrops", val);
-                        Config.simplecrops = val;
-                        a = val;
-                    }
-                });
-                appender.add(new CheckBox("Hide crops") {
-                    {
-                        a = Config.hidecrops;
-                    }
-
-                    public void set(boolean val) {
-                        Utils.setprefb("hidecrops", val);
-                        Config.hidecrops = val;
-                        a = val;
-                    }
-                });
-                appender.add(new CheckBox("smooth snow in minimap") {
-                    {
-                        a = Config.minimapsmooth;
-                    }
-
-                    public void set(boolean val) {
-                        Utils.setprefb("minimapsmooth", val);
-                        Config.minimapsmooth = val;
-                        a = val;
-                    }
-                });
-                appender.add(new CheckBox("Unhide crops near the player") {
-                    {
-                        a = Config.unhidenearcrops;
-                    }
-
-                    public void set(boolean val) {
-                        Utils.setprefb("unhidenearcrops", val);
-                        Config.unhidenearcrops = val;
-                        a = val;
-                    }
-                });
-                appender.add(new CheckBox("straight cave wall") {
-                    {
-                        a = Config.straightcavewall;
-                    }
-
-                    public void set(boolean val) {
-                        Utils.setprefb("straightcavewall", val);
-                        Config.straightcavewall = val;
-                        a = val;
-                    }
-                });
-                appender.add(new CheckBox("Show FPS") {
-                    {
-                        a = Config.showfps;
-                    }
-
-                    public void set(boolean val) {
-                        Utils.setprefb("showfps", val);
-                        Config.showfps = val;
-                        a = val;
-                    }
-                });
+                appender.add(new ConfBox("Disable biome tile transitions (requires logout)", "disabletiletrans"));
+                appender.add(new ConfBox("Disable terrain smoothing (requires logout)", "disableterrainsmooth"));
+                appender.add(new ConfBox("Disable terrain elevation (requires logout)", "disableelev"));
+                appender.add(new ConfBox("Disable flavor objects including ambient sounds", "hideflocomplete"));
+                appender.add(new ConfBox("Hide flavor objects but keep sounds (requires logout)", "hideflovisual"));
+                appender.add(new ConfBox("Show weather", "showweather"));
+                appender.add(new ConfBox("Simple crops (req. logout)", "simplecrops"));
+                appender.add(new ConfBox("Hide crops", "hidecrops"));
+                appender.add(new ConfBox("Unhide crops near the player", "unhidenearcrops"));
+                appender.add(new ConfBox("smooth snow in minimap", "minimapsmooth"));
+                appender.add(new ConfBox("straight cave wall",  "straightcavewall"));
+                appender.add(new ConfBox("Show FPS", "showfps"));
 
                 appender.add(new Label("Disable animations (req. restart):"));
                 CheckListbox disanimlist = new CheckListbox(320, Math.min(8, Config.disableanim.values().size()), 18 + Config.fontadd) {
@@ -568,60 +477,13 @@ public class OptWnd extends Window {
     private void initDisplayFirstColumn() {
         final WidgetVerticalAppender appender = new WidgetVerticalAppender(withScrollport(display, new Coord(620, 350)));
         appender.setVerticalMargin(VERTICAL_MARGIN);
-        appender.add(new CheckBox("Display kin names") {
-            {
-                a = Config.showkinnames;
-            }
-
+        appender.add(new ConfBox("Display kin names","showkinnames"));
+        appender.add(new ConfBox("Display item completion progress bar", "itemmeterbar"));
+        appender.add(new ConfBox("Show hourglass percentage", "showprogressperc"));
+        appender.add(new ConfBox("Show attributes & softcap values in craft window", "showcraftcap"));
+        appender.add(new ConfBox("Show objects health", "showgobhp") {
             public void set(boolean val) {
-                Utils.setprefb("showkinnames", val);
-                Config.showkinnames = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Display item completion progress bar") {
-            {
-                a = Config.itemmeterbar;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("itemmeterbar", val);
-                Config.itemmeterbar = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Show hourglass percentage") {
-            {
-                a = Config.showprogressperc;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("showprogressperc", val);
-                Config.showprogressperc = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Show attributes & softcap values in craft window") {
-            {
-                a = Config.showcraftcap;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("showcraftcap", val);
-                Config.showcraftcap = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Show objects health") {
-            {
-                a = Config.showgobhp;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("showgobhp", val);
-                Config.showgobhp = val;
-                a = val;
-
+                super.set(val);
                 GameUI gui = gameui();
                 if (gui != null && gui.map != null) {
                     if (val)
@@ -631,94 +493,14 @@ public class OptWnd extends Window {
                 }
             }
         });
-        appender.add(new CheckBox("Show player's path") {
-            {
-                a = Config.showplayerpaths;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("showplayerpaths", val);
-                Config.showplayerpaths = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Show animal radius") {
-            {
-                a = Config.showanimalrad;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("showanimalrad", val);
-                Config.showanimalrad = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Highlight empty/finished drying frames") {
-            {
-                a = Config.showdframestatus;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("showdframestatus", val);
-                Config.showdframestatus = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Highlight finished garden pots") {
-            {
-                a = Config.highlightpots;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("highlightpots", val);
-                Config.highlightpots = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Draw circles around party members") {
-            {
-                a = Config.partycircles;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("partycircles", val);
-                Config.partycircles = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Show last used curios in study window") {
-            {
-                a = Config.studyhist;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("studyhist", val);
-                Config.studyhist = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Display buff icon when study has free slots") {
-            {
-                a = Config.studybuff;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("studybuff", val);
-                Config.studybuff = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Miniature trees (req. logout)") {
-            {
-                a = Config.bonsai;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("bonsai", val);
-                Config.bonsai = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Show player's path", "showplayerpaths"));
+        appender.add(new ConfBox("Show animal radius", "showanimalrad"));
+        appender.add(new ConfBox("Highlight empty/finished drying frames", "showdframestatus"));
+        appender.add(new ConfBox("Highlight finished garden pots", "highlightpots"));
+        appender.add(new ConfBox("Draw circles around party members", "partycircles"));
+        appender.add(new ConfBox("Show last used curios in study window", "studyhist"));
+        appender.add(new ConfBox("Display buff icon when study has free slots", "studybuff"));
+        appender.add(new ConfBox("Miniature trees (req. logout)", "bonsai"));
     }
 
     private void initMinimap() {
@@ -755,17 +537,7 @@ public class OptWnd extends Window {
                 }
             }
         });
-        appender.add(new CheckBox("Save barter logs to disk") {
-            {
-                a = Config.bartersave;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("bartersave", val);
-                Config.bartersave = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Save barter logs to disk", "bartersave"));
         appender.add(new CheckBox("Save map tiles to disk") {
             {
                 a = Config.savemmap;
@@ -777,193 +549,23 @@ public class OptWnd extends Window {
                 a = val;
             }
         });
-        appender.add(new CheckBox("Show timestamps in chats") {
-            {
-                a = Config.chattimestamp;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("chattimestamp", val);
-                Config.chattimestamp = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Notify when kin comes online") {
-            {
-                a = Config.notifykinonline;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("notifykinonline", val);
-                Config.notifykinonline = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Auto hearth") {
-            {
-                a = Config.autohearth;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("autohearth", val);
-                Config.autohearth = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Auto logout on unknown/red players") {
-            {
-                a = Config.autologout;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("autologout", val);
-                Config.autologout = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Run on login") {
-            {
-                a = Config.runonlogin;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("runonlogin", val);
-                Config.runonlogin = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Show server time") {
-            {
-                a = Config.showservertime;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("showservertime", val);
-                Config.showservertime = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Enable tracking on login") {
-            {
-                a = Config.enabletracking;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("enabletracking", val);
-                Config.enabletracking = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Enable criminal acts on login") {
-            {
-                a = Config.enablecrime;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("enablecrime", val);
-                Config.enablecrime = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Drop mined stones") {
-            {
-                a = Config.dropMinedStones;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("dropMinedStones", val);
-                Config.dropMinedStones = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Drop mined ore") {
-            {
-                a = Config.dropMinedOre;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("dropMinedOre", val);
-                Config.dropMinedOre = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Drop mined silver/gold ore") {
-            {
-                a = Config.dropMinedOrePrecious;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("dropMinedOrePrecious", val);
-                Config.dropMinedOrePrecious = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Drop mined cat gold, petrified seashells, strange crystals") {
-            {
-                a = Config.dropMinedCurios;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("dropMinedCurios", val);
-                Config.dropMinedCurios = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Drop everything!!!") {
-            {
-                a = Config.dropEverything;
-            }
-
-            public void set(boolean val) {
-                //Utils.setprefb("dropEverything", val);
-                Config.dropEverything = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Drop soil") {
-            {
-                a = Config.dropSoil;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("dropSoil", val);
-                Config.dropSoil = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Write message log") {
-            {
-                a = Config.msglog;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("msglog", val);
-                Config.msglog = val;
-                a = val;
-            }
-        });		//dk
-        appender.add(new CheckBox("Enable localization debug") {
-            {
-                a = Config.enablel10ndebug;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("enablel10ndebug", val);
-                Config.enablel10ndebug = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Send food details to the food service (https://food.havenandhearth.link)") {
-            {
-                a = Config.foodService;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("foodService", val);
-                Config.foodService = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Show timestamps in chats", "chattimestamp"));
+        appender.add(new ConfBox("Notify when kin comes online", "notifykinonline"));
+        appender.add(new ConfBox("Auto hearth", "autohearth"));
+        appender.add(new ConfBox("Auto logout on unknown/red players", "autologout"));
+        appender.add(new ConfBox("Run on login", "runonlogin"));
+        appender.add(new ConfBox("Show server time", "showservertime"));
+        appender.add(new ConfBox("Enable tracking on login", "enabletracking"));
+        appender.add(new ConfBox("Enable criminal acts on login", "enablecrime"));
+        appender.add(new ConfBox("Drop mined stones", "dropMinedStones"));
+        appender.add(new ConfBox("Drop mined ore", "dropMinedOre"));
+        appender.add(new ConfBox("Drop mined silver/gold ore", "dropMinedOrePrecious"));
+        appender.add(new ConfBox("Drop mined cat gold, petrified seashells, strange crystals", "dropMinedCurios"));
+        appender.add(new ConfBox("Drop everything!!!", "dropEverything"));
+        appender.add(new ConfBox("Drop soil", "dropSoil"));
+        appender.add(new ConfBox("Write message log", "msglog"));		//dk
+        appender.add(new ConfBox("Enable localization debug", "enablel10ndebug"));
+        appender.add(new ConfBox("Send food details to the food service (https://food.havenandhearth.link)", "foodService"));
         general.add(new PButton(200, "Back", 27, main), new Coord(210, 360));
         general.pack();
     }
@@ -974,149 +576,19 @@ public class OptWnd extends Window {
         appender.setVerticalMargin(VERTICAL_MARGIN);
         appender.setHorizontalMargin(HORIZONTAL_MARGIN);
 
-        appender.add(new CheckBox("Display damage") {
-            {
-                a = Config.showdmgop;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("showdmgop", val);
-                Config.showdmgop = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Highlight current opponent") {
-            {
-                a = Config.hlightcuropp;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("hlightcuropp", val);
-                Config.hlightcuropp = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Display cooldown time") {
-            {
-                a = Config.showcooldown;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("showcooldown", val);
-                Config.showcooldown = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Show arrow vectors") {
-            {
-                a = Config.showarchvector;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("showarchvector", val);
-                Config.showarchvector = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Log combat actions to system log") {
-            {
-                a = Config.logcombatactions;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("logcombatactions", val);
-                Config.logcombatactions = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Alternative combat UI") {
-            {
-                a = Config.altfightui;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("altfightui", val);
-                Config.altfightui = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Simplified opening indicators") {
-            {
-                a = Config.combaltopenings;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("combaltopenings", val);
-                Config.combaltopenings = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Show key bindings in combat UI") {
-            {
-                a = Config.combshowkeys;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("combshowkeys", val);
-                Config.combshowkeys = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Aggro players in proximity to the mouse cursor") {
-            {
-                a = Config.proximityaggro;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("proximityaggro", val);
-                Config.proximityaggro = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Aggro animals in proximity to the mouse cursor") {
-            {
-                a = Config.proximityaggroanimal;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("proximityaggroanimal", val);
-                Config.proximityaggroanimal = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Chase small games in proximity to the mouse cursor (Alt+RMB)") {
-            {
-                a = Config.proximitychase;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("proximitychase", val);
-                Config.proximitychase = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Lift corpses etc in proximity to the mouse cursor") {
-            {
-                a = Config.proximitylift;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("proximitylift", val);
-                Config.proximitylift = val;
-                a = val;
-            }
-        });
-       appender.add(new CheckBox("Automatically give up") {
-            {
-                a = Config.autogive;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("autogive", val);
-                Config.autogive = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Display damage", "showdmgop"));
+        appender.add(new ConfBox("Highlight current opponent", "hlightcuropp"));
+        appender.add(new ConfBox("Display cooldown time", "showcooldown"));
+        appender.add(new ConfBox("Show arrow vectors", "showarchvector"));
+        appender.add(new ConfBox("Log combat actions to system log", "logcombatactions"));
+        appender.add(new ConfBox("Alternative combat UI", "altfightui"));
+        appender.add(new ConfBox("Simplified opening indicators", "combaltopenings"));
+        appender.add(new ConfBox("Show key bindings in combat UI", "combshowkeys"));
+        appender.add(new ConfBox("Aggro players in proximity to the mouse cursor", "proximityaggro"));
+        appender.add(new ConfBox("Aggro animals in proximity to the mouse cursor", "proximityaggroanimal"));
+        appender.add(new ConfBox("Chase small games in proximity to the mouse cursor (Alt+RMB)", "proximitychase"));
+        appender.add(new ConfBox("Lift corpses etc in proximity to the mouse cursor", "proximitylift"));
+       appender.add(new ConfBox("Automatically give up", "autogive"));
 
         combat.add(new PButton(200, "Back", 27, main), new Coord(210, 360));
         combat.pack();
@@ -1140,83 +612,13 @@ public class OptWnd extends Window {
                         Utils.setprefi("badcamsensitivity", val);
                     }
                 });
-        appender.add(new CheckBox("Use French (AZERTY) keyboard layout") {
-            {
-                a = Config.userazerty;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("userazerty", val);
-                Config.userazerty = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Reverse bad camera MMB x-axis") {
-            {
-                a = Config.reversebadcamx;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("reversebadcamx", val);
-                Config.reversebadcamx = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Reverse bad camera MMB y-axis") {
-            {
-                a = Config.reversebadcamy;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("reversebadcamy", val);
-                Config.reversebadcamy = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Force hardware cursor (req. restart)") {
-            {
-                a = Config.hwcursor;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("hwcursor", val);
-                Config.hwcursor = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Disable dropping items over water (overridable with Ctrl)") {
-            {
-                a = Config.nodropping;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("nodropping", val);
-                Config.nodropping = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Disable dropping items over anywhere (overridable with Ctrl)") {
-            {
-                a = Config.nodropping_all;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("nodropping_all", val);
-                Config.nodropping_all = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Enable full zoom-out in Ortho cam") {
-            {
-                a = Config.enableorthofullzoom;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("enableorthofullzoom", val);
-                Config.enableorthofullzoom = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Use French (AZERTY) keyboard layout", "userazerty"));
+        appender.add(new ConfBox("Reverse bad camera MMB x-axis", "reversebadcamx"));
+        appender.add(new ConfBox("Reverse bad camera MMB y-axis", "reversebadcamy"));
+        appender.add(new ConfBox("Force hardware cursor (req. restart)", "hwcursor"));
+        appender.add(new ConfBox("Disable dropping items over water (overridable with Ctrl)", "nodropping"));
+        appender.add(new ConfBox("Disable dropping items over anywhere (overridable with Ctrl)", "nodropping_all"));
+        appender.add(new ConfBox("Enable full zoom-out in Ortho cam", "enableorthofullzoom"));
 
         control.add(new PButton(200, "Back", 27, main), new Coord(210, 360));
         control.pack();
@@ -1251,17 +653,7 @@ public class OptWnd extends Window {
                 }
             }
         });
-        appender.add(new CheckBox("Alternative equipment belt window") {
-            {
-                a = Config.quickbelt;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("quickbelt", val);
-                Config.quickbelt = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Alternative equipment belt window", "quickbelt"));
         appender.add(new CheckBox("Show F-key toolbar") {
             {
                 a = Config.fbelt;
@@ -1283,17 +675,7 @@ public class OptWnd extends Window {
                 }
             }
         });
-        appender.add(new CheckBox("Show inventory on login") {
-            {
-                a = Config.showinvonlogin;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("showinvonlogin", val);
-                Config.showinvonlogin = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Show inventory on login", "showinvonlogin"));
         appender.add(new CheckBox("Show Craft/Build history toolbar") {
             {
                 a = Config.histbelt;
@@ -1315,17 +697,7 @@ public class OptWnd extends Window {
                 }
             }
         });
-        appender.add(new CheckBox("Display confirmation dialog when using magic") {
-            {
-                a = Config.confirmmagic;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("confirmmagic", val);
-                Config.confirmmagic = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Display confirmation dialog when using magic", "confirmmagic"));
         appender.addRow(new Label("Tree bounding box color (6-digit HEX):"),
                 new TextEntry(85, Config.treeboxclr) {
                     @Override
@@ -1346,17 +718,7 @@ public class OptWnd extends Window {
                 }
         );
         appender.addRow(new Label("Chat font size (req. restart):"), makeFontSizeChatDropdown());
-        appender.add(new CheckBox("Font antialiasing") {
-            {
-                a = Config.fontaa;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("fontaa", val);
-                Config.fontaa = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Font antialiasing", "fontaa"));
         appender.addRow(new CheckBox("Custom interface font (req. restart):") {
             {
                 a = Config.usefont;
@@ -1418,39 +780,9 @@ public class OptWnd extends Window {
         final WidgetVerticalAppender appender = new WidgetVerticalAppender(withScrollport(quality, new Coord(620, 350)));
         appender.setVerticalMargin(VERTICAL_MARGIN);
         appender.setHorizontalMargin(HORIZONTAL_MARGIN);
-        appender.add(new CheckBox("Show item quality") {
-            {
-                a = Config.showquality;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("showquality", val);
-                Config.showquality = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Round item quality to a whole number") {
-            {
-                a = Config.qualitywhole;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("qualitywhole", val);
-                Config.qualitywhole = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Draw background for quality values") {
-            {
-                a = Config.qualitybg;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("qualitybg", val);
-                Config.qualitybg = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Show item quality", "showquality"));
+        appender.add(new ConfBox("Round item quality to a whole number", "qualitywhole"));
+        appender.add(new ConfBox("Draw background for quality values", "qualitybg"));
         appender.addRow(
             new Label("Background transparency (req. restart):"),
             new HSlider(200, 0, 255, Config.qualitybgtransparency) {
@@ -1459,6 +791,8 @@ public class OptWnd extends Window {
                     Config.qualitybgtransparency = val;
                 }
             });
+        
+        appender.add(new ConfBox("Show q10 FEP values in tooltips", "foodbaseq"));
 
         quality.add(new PButton(200, "Back", 27, main), new Coord(210, 360));
         quality.pack();
@@ -1470,17 +804,7 @@ public class OptWnd extends Window {
         appender.setVerticalMargin(VERTICAL_MARGIN);
         appender.setHorizontalMargin(HORIZONTAL_MARGIN);
 
-        appender.add(new CheckBox("Automatically pick all clustered mussels (auto 'Pick' needs to be enabled)") {
-            {
-                a = Config.autopickmussels;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("autopickmussels", val);
-                Config.autopickmussels = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Automatically pick all clustered mussels (auto 'Pick' needs to be enabled)", "autopickmussels"));
         appender.add(new Label("Automatic selecton:"));
 
         CheckListbox flowerlist = new CheckListbox(140, 17) {
@@ -1507,17 +831,7 @@ public class OptWnd extends Window {
         appender.setHorizontalMargin(HORIZONTAL_MARGIN);
 
         appender.setVerticalMargin(0);
-        appender.add(new CheckBox("Alarm on unknown players") {
-            {
-                a = Config.alarmunknown;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("alarmunknown", val);
-                Config.alarmunknown = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Alarm on unknown players", "alarmunknown"));
         appender.setVerticalMargin(VERTICAL_AUDIO_MARGIN);
         appender.add(new HSlider(200, 0, 1000, 0) {
             protected void attach(UI ui) {
@@ -1532,17 +846,7 @@ public class OptWnd extends Window {
             }
         });
         appender.setVerticalMargin(0);
-        appender.add(new CheckBox("Alarm on red players") {
-            {
-                a = Config.alarmred;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("alarmred", val);
-                Config.alarmred = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Alarm on red players", "alarmred"));
         appender.setVerticalMargin(VERTICAL_AUDIO_MARGIN);
         appender.add(new HSlider(200, 0, 1000, 0) {
             protected void attach(UI ui) {
@@ -1557,17 +861,7 @@ public class OptWnd extends Window {
             }
         });
         appender.setVerticalMargin(0);
-        appender.add(new CheckBox("Alarm on new private/party chat") {
-            {
-                a = Config.chatalarm;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("chatalarm", val);
-                Config.chatalarm = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Alarm on new private/party chat", "chatalarm"));
         appender.setVerticalMargin(VERTICAL_AUDIO_MARGIN);
         appender.add(new HSlider(200, 0, 1000, 0) {
             protected void attach(UI ui) {
@@ -1582,17 +876,7 @@ public class OptWnd extends Window {
             }
         });
         appender.setVerticalMargin(0);
-        appender.add(new CheckBox("Alarm when curio finishes") {
-            {
-                a = Config.studyalarm;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("studyalarm", val);
-                Config.studyalarm = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Alarm when curio finishes", "studyalarm"));
         appender.setVerticalMargin(VERTICAL_AUDIO_MARGIN);
         appender.add(new HSlider(200, 0, 1000, 0) {
             protected void attach(UI ui) {
@@ -1606,17 +890,7 @@ public class OptWnd extends Window {
                 Utils.setprefd("studyalarmvol", vol);
             }
         });
-        appender.add(new CheckBox("Alarm on trolls") {
-            {
-                a = Config.alarmtroll;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("alarmtroll", val);
-                Config.alarmtroll = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Alarm on trolls", "alarmtroll"));
         appender.setVerticalMargin(VERTICAL_AUDIO_MARGIN);
         appender.add(new HSlider(200, 0, 1000, 0) {
             protected void attach(UI ui) {
@@ -1631,17 +905,7 @@ public class OptWnd extends Window {
             }
         });
         appender.setVerticalMargin(0);
-        appender.add(new CheckBox("Alarm on battering rams and catapults") {
-            {
-                a = Config.alarmbram;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("alarmbram", val);
-                Config.alarmbram = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Alarm on battering rams and catapults", "alarmbram"));
         appender.setVerticalMargin(VERTICAL_AUDIO_MARGIN);
         appender.add(new HSlider(200, 0, 1000, 0) {
             protected void attach(UI ui) {
@@ -1656,17 +920,7 @@ public class OptWnd extends Window {
             }
         });
         appender.setVerticalMargin(0);
-        appender.add(new CheckBox("Alarm on localized resources") {
-            {
-                a = Config.alarmlocres;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("alarmlocres", val);
-                Config.alarmlocres = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Alarm on localized resources", "alarmlocres"));
         appender.setVerticalMargin(VERTICAL_AUDIO_MARGIN);
         appender.add(new HSlider(200, 0, 1000, 0) {
             protected void attach(UI ui) {
@@ -1728,50 +982,10 @@ public class OptWnd extends Window {
                     }
                 }
         );
-        appender.add(new CheckBox("Enable mapping service") {
-            {
-                a = Config.mapperEnabled;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("mapperEnabled", val);
-                Config.mapperEnabled = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Hide character name") {
-            {
-                a = Config.mapperHashName;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("mapperHashName", val);
-                Config.mapperHashName = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Enable navigation tracking") {
-            {
-                a = Config.enableNavigationTracking;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("enableNavigationTracking", val);
-                Config.enableNavigationTracking = val;
-                a = val;
-            }
-        });
-        appender.add(new CheckBox("Upload custom GREEN markers to map") {
-            {
-                a = Config.sendCustomMarkers;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("sendCustomMarkers", val);
-                Config.sendCustomMarkers = val;
-                a = val;
-            }
-        });
+        appender.add(new ConfBox("Enable mapping service", "mapperEnabled"));
+        appender.add(new ConfBox("Hide character name", "mapperHashName"));
+        appender.add(new ConfBox("Enable navigation tracking", "enableNavigationTracking"));
+        appender.add(new ConfBox("Upload custom GREEN markers to map", "sendCustomMarkers"));
 
         appender.add(new Label(""));
 		appender.add(new Label("Vendan Map-v4:", sectionfndr));

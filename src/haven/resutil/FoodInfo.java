@@ -39,7 +39,6 @@ public class FoodInfo extends ItemInfo.Tip {
     public final Event[] evs;
     public final Effect[] efs;
     public final int[] types;
-    public static boolean showbaseq;
     private final static DecimalFormat basefepfmt = new DecimalFormat("0.##");
 
     public FoodInfo(Owner owner, double end, double glut, double cons, Event[] evs, Effect[] efs, int[] types) {
@@ -93,7 +92,7 @@ public class FoodInfo extends ItemInfo.Tip {
         for (int i = 0; i < evs.length; i++) {
             Color col = Utils.blendcol(evs[i].ev.col, Color.WHITE, 0.5);
             String str;
-            if (showbaseq && owner instanceof GItem) {
+            if (Config.foodbaseq && owner instanceof GItem) {
                 QBuff q = ((GItem) owner).quality();
                 str = String.format("%s: $col[%d,%d,%d]{%s}  $col[%d,%d,%d]{(%s)}",
                         evs[i].ev.nm,
