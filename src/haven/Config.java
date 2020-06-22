@@ -179,6 +179,7 @@ public class Config {
     public static boolean autogive = Utils.getprefb("autogive", false);
     public static boolean enablel10ndebug = Utils.getprefb("enablel10ndebug", false);//DK
     public static boolean straightcavewall = Utils.getprefb("straightcavewall", false);
+    public static boolean placecam = Utils.getprefb("placecam", false);
     public static boolean msglog = Utils.getprefb("msglog", false);
     public static boolean foodbaseq = Utils.getprefb("foodbaseq", false);
     public static boolean foodService = Utils.getprefb("foodService", false);

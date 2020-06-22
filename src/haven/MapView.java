@@ -259,12 +259,15 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         private float angl = 0.0f;
         private Coord dragorig = null;
         private float elevorig, anglorig;
+        Coord3f cc = null;
 
         public void tick(double dt) {
-            Coord3f cc = getcc();
-            cc.y = -cc.y;
-            if (Config.disableelev)
-                cc.z = 0;
+            if (!Config.placecam || placing == null) {
+                cc = getcc();
+                cc.y = -cc.y;
+                if (Config.disableelev)
+                    cc.z = 0;
+            }
             view.update(PointedCam.compute(cc.add(camoff).add(0.0f, 0.0f, 15f), dist, elev, angl));
         }
 

@@ -229,6 +229,7 @@ public class OptWnd extends Window {
                 appender.add(new ConfBox("Unhide crops near the player", "unhidenearcrops"));
                 appender.add(new ConfBox("smooth snow in minimap", "minimapsmooth"));
                 appender.add(new ConfBox("straight cave wall",  "straightcavewall"));
+                appender.add(new ConfBox("do not move camara when placing",  "placecam"));
                 appender.add(new ConfBox("Show FPS", "showfps"));
 
                 appender.add(new Label("Disable animations (req. restart):"));
