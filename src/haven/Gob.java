@@ -310,6 +310,10 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
         return rc.floor(OCache.posres);
     }
 
+    public Coord gettc() {
+        return rc.floor(OCache.posres);
+    }
+
     public double geta() {
         return a;
     }

@@ -3,8 +3,6 @@ package haven.automation;
 
 import haven.*;
 
-import static haven.OCache.posres;
-
 public class FeedClover implements Runnable {
     private GameUI gui;
     private Gob animal;
@@ -64,6 +62,6 @@ public class FeedClover implements Runnable {
             }
         }
 
-        gui.map.wdgmsg("itemact", Coord.z, animal.rc.floor(posres), 0, 0, (int) animal.id, animal.rc.floor(posres), 0, -1);
+        gui.map.wdgmsg("itemact", Coord.z, animal.getnc(), 0, 0, (int) animal.id, animal.getnc(), 0, -1);
     }
 }

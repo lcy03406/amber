@@ -6,8 +6,6 @@ import haven.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import static haven.OCache.posres;
-
 public class TrellisDestroy implements Runnable {
     private GameUI gui;
     private Set<String> plants = new HashSet<>(5);
@@ -42,7 +40,7 @@ public class TrellisDestroy implements Runnable {
             return;
 
         gui.act("destroy");
-        gui.map.wdgmsg("click", plant.sc, plant.rc.floor(posres), 1, 0, 0, (int) plant.id, plant.rc.floor(posres), 0, -1);
+        gui.map.wdgmsg("click", plant.sc, plant.getnc(), 1, 0, 0, (int) plant.id, plant.getnc(), 0, -1);
         gui.map.wdgmsg("click", Coord.z, Coord.z, 3, 0);
     }
 }

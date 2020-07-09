@@ -3,8 +3,6 @@ package haven.automation;
 
 import haven.*;
 
-import static haven.OCache.posres;
-
 public class MusselPicker implements Runnable {
     private GameUI gui;
     private Gob initMussel;
@@ -50,7 +48,7 @@ public class MusselPicker implements Runnable {
             if (closestsMussel == null || closestsMussel.rc.dist(initMussel.rc) > 11 * 5)
                 return;
 
-            gui.map.wdgmsg("click", closestsMussel.sc, closestsMussel.rc.floor(posres), 3, 0, 0, (int) closestsMussel.id, closestsMussel.rc.floor(posres), 0, -1);
+            gui.map.wdgmsg("click", closestsMussel.sc, closestsMussel.getnc(), 3, 0, 0, (int) closestsMussel.id, closestsMussel.getnc(), 0, -1);
 
             s = System.currentTimeMillis();
             while (!Thread.currentThread().isInterrupted()) {

@@ -528,7 +528,7 @@ public class LocalMiniMap extends Widget {
             if (gob == null) {
                 mv.wdgmsg("click", rootpos().add(csd), mc.floor(posres), button, ui.modflags());
             } else {
-                mv.wdgmsg("click", rootpos().add(csd), mc.floor(posres), button, ui.modflags(), 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
+                mv.wdgmsg("click", rootpos().add(csd), mc.floor(posres), button, ui.modflags(), 0, (int) gob.id, gob.getnc(), 0, -1);
                 if (Config.autopickmussels && gob.type == Gob.Type.MUSSEL)
                     mv.startMusselsPicker(gob);
             }

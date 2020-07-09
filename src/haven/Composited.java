@@ -500,7 +500,7 @@ public class Composited implements Rendered, MapView.Clickable {
         for (int g = 0; g < st.length; g++) {
             if (st[g] instanceof Gob) {
                 Gob gob = (Gob) st[g];
-                Object[] ret = {0, (int) gob.id, gob.rc.floor(OCache.posres), 0, 0};
+                Object[] ret = {0, (int) gob.id, gob.getnc(), 0, 0};
                 int id = 0;
                 for (int i = g - 1; i >= 0; i--) {
                     if (st[i] instanceof Model) {

@@ -3,8 +3,6 @@ package haven.automation;
 
 import haven.*;
 
-import static haven.OCache.posres;
-
 public class LightWithTorch implements Runnable {
     private GameUI gui;
     private Gob gob;
@@ -70,7 +68,7 @@ public class LightWithTorch implements Runnable {
                 }
             }
 
-            gui.map.wdgmsg("itemact", Coord.z, gob.rc.floor(posres), 0, 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
+            gui.map.wdgmsg("itemact", Coord.z, gob.getnc(), 0, 0, (int) gob.id, gob.getnc(), 0, -1);
 
             if (!Utils.waitForProgressFinish(gui, TIMEOUT_ACT, "Oops something went wrong. Timeout when trying to light with torch.")) {
                 e.wdgmsg("drop", noltorch ? 7 : 6);

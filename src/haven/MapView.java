@@ -1870,7 +1870,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                 modflags = modflags & ~4;
             }
             if (target != null) {
-                wdgmsg("click", target.sc, target.rc.floor(posres), clickb, modflags, 0, (int) target.id, target.rc.floor(posres), 0, -1);
+                wdgmsg("click", target.sc, target.getnc(), clickb, modflags, 0, (int) target.id, target.getnc(), 0, -1);
                 return;
             }
 
@@ -1930,10 +1930,10 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                 if (gob.id == lastAggroTarget) {
                     gameui().act("aggro");
                     target = gob;
-                    Object args[] = {target.sc, target.rc.floor(posres), 1, 0, 0, (int) target.id, target.rc.floor(posres), 0, -1};
+                    Object args[] = {target.sc, target.getnc(), 1, 0, 0, (int) target.id, target.getnc(), 0, -1};
                     wdgmsg("click", args);
                     Gob pl = player();
-                    wdgmsg("click", pl.sc, pl.rc.floor(posres), 3, 0);
+                    wdgmsg("click", pl.sc, pl.getnc(), 3, 0);
                     String tip = "aggroLastTarget sc=%s rc=%s c=%s m=%s 0=%s id=%s rc=%s 0=%s -1=%s";
                     gameui().msg(String.format(tip, args), Color.WHITE);
                     return;
@@ -2036,7 +2036,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                 camdrag = ui.grabmouse(this);
         } else if (placing != null) {
             if (placing.lastmc != null)
-                wdgmsg("place", placing.rc.floor(posres), (int)Math.round(placing.a * 32768 / Math.PI), button, ui.modflags());
+                wdgmsg("place", placing.getnc(), (int)Math.round(placing.a * 32768 / Math.PI), button, ui.modflags());
         } else if ((grab != null) && grab.mmousedown(c, button)) {
         } else {
             delay(new Click(c, button));
@@ -2487,9 +2487,9 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 
             if (gobcls != null) {
                 gameui().act("aggro");
-                wdgmsg("click", gobcls.sc, Coord.z, 1, ui.modflags(), 0, (int) gobcls.id, gobcls.rc.floor(posres), 0, 0);
+                wdgmsg("click", gobcls.sc, Coord.z, 1, ui.modflags(), 0, (int) gobcls.id, gobcls.getnc(), 0, 0);
                 Gob pl = player();
-                wdgmsg("click", pl.sc, pl.rc.floor(posres), 3, 0);
+                wdgmsg("click", pl.sc, pl.getnc(), 3, 0);
             }
         }
     }

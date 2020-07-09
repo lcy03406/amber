@@ -10,9 +10,6 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import static haven.OCache.posres;
-
-
 public class SteelRefueler extends Window implements GobSelectCallback {
     private static final Text.Foundry infof = new Text.Foundry(Text.sans, 10).aa(true);
     private List<Gob> crucibles = new ArrayList<>();
@@ -169,7 +166,7 @@ public class SteelRefueler extends Window implements GobSelectCallback {
                         if (terminate)
                             return;
 
-                        gui.map.wdgmsg("itemact", Coord.z, c.rc.floor(posres), fueltoload == 1 ? 0 : 1, 0, (int) c.id, c.rc.floor(posres), 0, -1);
+                        gui.map.wdgmsg("itemact", Coord.z, c.getnc(), fueltoload == 1 ? 0 : 1, 0, (int) c.id, c.getnc(), 0, -1);
                         timeout = 0;
                         while (true) {
                             WItem newfuel = gui.vhand;

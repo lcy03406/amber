@@ -3,8 +3,6 @@ package haven.automation;
 
 import haven.*;
 
-import static haven.OCache.posres;
-
 public class Shoo implements Runnable {
     private GameUI gui;
 
@@ -38,6 +36,6 @@ public class Shoo implements Runnable {
             return;
 
         FlowerMenu.setNextSelection("Shoo");
-        gui.map.wdgmsg("click", animal.sc, animal.rc.floor(posres), 3, 0, 0, (int) animal.id, animal.rc.floor(posres), 0, -1);
+        gui.map.wdgmsg("click", animal.sc, animal.getnc(), 3, 0, 0, (int) animal.id, animal.getnc(), 0, -1);
     }
 }
