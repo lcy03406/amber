@@ -311,7 +311,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     }
 
     public Coord gettc() {
-        return rc.floor(OCache.posres);
+        return rc.floor(MCache.tilesz);
     }
 
     public double geta() {

@@ -44,12 +44,13 @@ import java.util.*;
 
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
+import static haven.MCache.tilensz;
 
 public class MapView extends PView implements DTarget, Console.Directory, PFListener {
     public static boolean clickdb = false;
     public static long plgob = -1;
     public static Coord2d pllastcc;
-    public Coord2d cc;
+    public Coord cc;
     public final Glob glob;
     private static final int view = 2;
     private Collection<Delayed> delayed = new LinkedList<Delayed>();
@@ -87,7 +88,24 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     public static final Material.Colors markedFx = new Material.Colors(new Color(21, 127, 208, 255));
     public Object[] lastItemactClickArgs;
     public long lastAggroTarget;
+    
+    // 1 tc = 1000 nc = 11.0 rc = 11 mc 
+    
+    public static Coord2d nc2rc(Coord nc) {
+        return nc.mul(tilesz).div(tilensz.x, tilensz.y);
+    }
+    
+    public static Coord nc2mc(Coord nc) {
+        return nc.mul(tilesz.round()).div(tilensz);
+    }
+    
+    public static Coord nc2tc(Coord nc) {
+        return nc.div(tilensz);
+    }
 
+    public static Coord ncCenter(Coord nc) {
+        return nc.div(tilensz).mul(tilensz).add(tilensz.div(2));
+    }
     public interface Delayed {
         public void run(GOut g);
     }
@@ -504,15 +522,15 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     public static class $_ implements Factory {
         public Widget create(UI ui, Object[] args) {
             Coord sz = (Coord) args[0];
-            Coord2d mc = ((Coord)args[1]).mul(posres);
+            Coord nc = (Coord)args[1];
             int pgob = -1;
             if (args.length > 2)
                 pgob = (Integer) args[2];
-            return (new MapView(sz, ui.sess.glob, mc, pgob));
+            return (new MapView(sz, ui.sess.glob, nc, pgob));
         }
     }
 
-    public MapView(Coord sz, Glob glob, Coord2d cc, long plgob) {
+    public MapView(Coord sz, Glob glob, Coord cc, long plgob) {
         super(sz);
         this.glob = glob;
         this.cc = cc;
@@ -552,7 +570,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         public void draw(GOut g) {}
 
         public Object staticp() {
-            Coord cc = MapView.this.cc.floor(tilesz).div(MCache.cutsz);
+            Coord cc = nc2tc(MapView.this.cc).div(MCache.cutsz);
             int mseq = glob.map.olseq;
             if(loading || !Utils.eq(cc, this.cc) || (mseq != this.mseq)) {
                 loading = false;
@@ -586,7 +604,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         }
 
         public boolean setup(RenderList rl) {
-            Coord cc = MapView.this.cc.floor(tilesz).div(MCache.cutsz);
+            Coord cc = nc2tc(MapView.this.cc).div(MCache.cutsz);
             Coord o = new Coord();
             for (o.y = -view; o.y <= view; o.y++) {
                 for (o.x = -view; o.x <= view; o.x++) {
@@ -638,7 +656,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         }
 
         public boolean setup(RenderList rl) {
-            Coord cc = MapView.this.cc.floor(tilesz).div(MCache.cutsz);
+            Coord cc = nc2tc(MapView.this.cc).div(MCache.cutsz);
             Coord o = new Coord();
             for (o.y = -view; o.y <= view; o.y++) {
                 for (o.x = -view; o.x <= view; o.x++) {
@@ -678,7 +696,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
             xf = gob.loc;
             try {
                 Coord3f c = gob.getc();
-                Tiler tile = glob.map.tiler(glob.map.gettile(new Coord2d(c).floor(tilesz)));
+                Tiler tile = glob.map.tiler(glob.map.gettile(gob.gettc()));
                 extra = tile.drawstate(glob, rl.cfg, c);
             } catch (Loading e) {
                 extra = null;
@@ -1050,7 +1068,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         if (pl != null)
             return (pl.getc());
         else
-            return(glob.map.getzp(cc));
+            return(glob.map.getzp(nc2rc(cc)));
     }
     
     public Coord2d getplc() {
@@ -1058,7 +1076,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         if (pl != null)
             return (pl.rc);
         else
-            return(cc);
+            return(nc2rc(cc));
     }
 
     public static class ClickContext extends RenderContext {
@@ -1174,11 +1192,11 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         }
     }
 
-    private void checkmapclick(final GOut g, final Coord c, final Callback<Coord2d> cb) {
+    private void checkmapclick(final GOut g, final Coord c, final Callback<Coord> cb) {
         new Object() {
             MapMesh cut;
             Coord tile;
-            Coord2d pixel;
+            Coord pixel;
             int dfl = 0;
 
             {
@@ -1198,7 +1216,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                     g.getimage(img -> Debug.dumpimage(img, Debug.somedir("click2.png")));
                 g.getpixel(c, col -> {
                     tile = new Coord(col.getRed() - 1, col.getGreen() - 1);
-                    pixel = new Coord2d((col.getBlue() * tilesz.x) / 255, (col.getAlpha() * tilesz.y) / 255);
+                    pixel = new Coord((col.getBlue() * tilensz.x) / 255, (col.getAlpha() * tilensz.y) / 255);
                     ckdone(2);
                 });
             }
@@ -1209,7 +1227,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                         if ((cut == null) || !tile.isect(Coord.z, cut.sz))
                             cb.done(null);
                         else
-                            cb.done(cut.ul.add(tile).mul(tilesz).add(pixel));
+                            cb.done(cut.ul.add(tile).mul(tilensz).add(pixel));
                     }
                 }
             }
@@ -1445,23 +1463,23 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                 throw (new Loading(camload));
             Gob pl = player();
             if (pl != null)
-                this.cc = new Coord2d(pl.getc());
+                this.cc = pl.getnc();
             undelay(delayed, g);
             super.draw(g);
             undelay(delayed2, g);
             poldraw(g);
             partydraw(g);
             try {
-                glob.map.reqarea(cc.floor(tilesz).sub(MCache.cutsz.mul(view + 1)),
-                        cc.floor(tilesz).add(MCache.cutsz.mul(view + 1)));
+                glob.map.reqarea(nc2tc(cc).sub(MCache.cutsz.mul(view + 1)),
+                        nc2tc(cc).add(MCache.cutsz.mul(view + 1)));
             } catch (Defer.DeferredException e) {
                 // there seems to be a rare problem with fetching gridcuts when teleporting, not sure why...
                 // we ignore Defer.DeferredException to prevent the client for crashing
             }
 
             if (showgrid) {
-                double tx = Math.ceil(cc.x / tilesz.x / MCache.cutsz.x);
-                double ty = Math.ceil(cc.y / tilesz.y / MCache.cutsz.y);
+                double tx = Math.ceil(cc.x / tilensz.x / MCache.cutsz.x);
+                double ty = Math.ceil(cc.y / tilensz.y / MCache.cutsz.y);
                 Coord tc = new Coord((int)(tx - view - 1) * MCache.cutsz.x, (int)(ty - view - 1) * MCache.cutsz.y);
                 if (!tc.equals(lasttc)) {
                     lasttc = tc;
@@ -1506,22 +1524,22 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     }
 
     public static interface PlobAdjust {
-        public void adjust(Plob plob, Coord pc, Coord2d mc, int modflags);
+        public void adjust(Plob plob, Coord pc, Coord mc, int modflags);
 
         public boolean rotate(Plob plob, int amount, int modflags);
     }
 
     public static class StdPlace implements PlobAdjust {
         boolean freerot = false;
-        Coord2d gran = (plobgran == 0)?null:new Coord2d(1.0 / plobgran, 1.0 / plobgran).mul(tilesz);
+        Coord gran = (plobgran == 0)?null:tilensz.div(plobgran);
 
-        public void adjust(Plob plob, Coord pc, Coord2d mc, int modflags) {
+        public void adjust(Plob plob, Coord pc, Coord mc, int modflags) {
             if ((modflags & 2) == 0)
-                plob.rc = mc.floor(tilesz).mul(tilesz).add(tilesz.div(2));
+                plob.rc = nc2rc(ncCenter(mc));
             else if(gran != null)
-                plob.rc = mc.add(gran.div(2)).floor(gran).mul(gran);
+                plob.rc = nc2rc(mc.add(gran.div(2)).div(gran).mul(gran));
             else
-                plob.rc = mc;
+                plob.rc = nc2rc(mc);
             Gob pl = plob.mv().player();
             if ((pl != null) && !freerot)
                 plob.a = Math.round(plob.rc.angle(pl.rc) / (Math.PI / 2)) * (Math.PI / 2);
@@ -1564,7 +1582,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                 this.modflags = modflags;
             }
 
-            public void hit(Coord pc, Coord2d mc) {
+            public void hit(Coord pc, Coord mc) {
                 adjust.adjust(Plob.this, pc, mc, modflags);
                 lastmc = pc;
             }
@@ -1607,7 +1625,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
             placing = null;
             BeetBox.event("PlaceStop");
         } else if (msg == "move") {
-            cc = ((Coord)args[0]).mul(posres);
+            cc = (Coord)args[0];
         } else if (msg == "plob") {
             if (args[0] == null)
                 plgob = -1;
@@ -1654,10 +1672,10 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                 g.st.set(clickbasic(g));
                 g.apply();
                 gl.glClear(GL.GL_DEPTH_BUFFER_BIT | GL.GL_COLOR_BUFFER_BIT);
-                checkmapclick(g, pc, mc -> {
+                checkmapclick(g, pc, nc -> {
                     synchronized(ui) {
-                        if(mc != null)
-                            hit(pc, mc);
+                        if(nc != null)
+                            hit(pc, nc);
                         else
                             nohit(pc);
                     }
@@ -1667,7 +1685,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
             }
         }
 
-        protected abstract void hit(Coord pc, Coord2d mc);
+        protected abstract void hit(Coord pc, Coord nc);
 
         protected void nohit(Coord pc) {
         }
@@ -1675,7 +1693,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 
     public abstract class Hittest implements Delayed {
         private final Coord clickc;
-        private Coord2d mapcl;
+        private Coord mapcl;
         private ClickInfo gobcl;
         private int dfl = 0;
 
@@ -1690,7 +1708,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                 g.st.set(clickbasic(g));
                 g.apply();
                 gl.glClear(GL.GL_DEPTH_BUFFER_BIT | GL.GL_COLOR_BUFFER_BIT);
-                checkmapclick(g, clickc, mc -> {mapcl = mc; ckdone(1);});
+                checkmapclick(g, clickc, nc -> {mapcl = nc; ckdone(1);});
                 g.st.set(bk);
                 g.st.set(clickbasic(g));
                 g.apply();
@@ -1718,7 +1736,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
             }
         }
 
-        protected abstract void hit(Coord pc, Coord2d mc, ClickInfo inf);
+        protected abstract void hit(Coord pc, Coord nc, ClickInfo inf);
 
         protected void nohit(Coord pc) {
         }
@@ -1739,7 +1757,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         for (int g = 0; g < st.length; g++) {
             if (st[g] instanceof Gob) {
                 Gob gob = (Gob) st[g];
-                Object[] ret = {0, (int) gob.id, gob.rc.floor(posres), 0, -1};
+                Object[] ret = {0, (int) gob.id, gob.getnc(), 0, -1};
                 for (int i = g - 1; i >= 0; i--) {
                     if (st[i] instanceof Gob.Overlay) {
                         ret[0] = 1;
@@ -1834,8 +1852,9 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
             return target;
         }
 
-        protected void hit(Coord pc, Coord2d mc, ClickInfo inf) {
+        protected void hit(Coord pc, Coord nc, ClickInfo inf) {
             lastItemactClickArgs = null;
+            Coord2d mc = nc2rc(nc);
             if (clickb == 1)
                 pllastcc = mc;
             // reset alt so we could walk with alt+lmb while having item on the cursor
@@ -2055,12 +2074,12 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
             }
         } else if (ui.modshift && !ui.modctrl && Config.resinfo) {
             long now = System.currentTimeMillis();
-            if ((now - lastmmhittest > 500 || lasthittestc.dist(c) > tilesz.x) && gameui().hand.isEmpty()) {
+            if ((now - lastmmhittest > 200 || lasthittestc.dist(c) > tilensz.x) && gameui().hand.isEmpty()) {
                 lastmmhittest = now;
                 lasthittestc = c;
 
                 delay(new Hittest(c) {
-                    protected void hit(Coord pc, Coord2d mc, ClickInfo inf) {
+                    protected void hit(Coord pc, Coord mc, ClickInfo inf) {
                         if (inf != null) {
                             MapView.gobclickargs(inf);
                             if (inf.gob != null) {
@@ -2081,14 +2100,14 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
             }
         } else if (ui.modshift && ui.modctrl && Config.resinfo) {
             long now = System.currentTimeMillis();
-            if (now - lastmmhittest > 500 || lasthittestc.dist(c) > tilesz.x) {
+            if (now - lastmmhittest > 200 || lasthittestc.dist(c) > tilensz.x) {
                 lastmmhittest = now;
                 lasthittestc = c;
                 delay(new Hittest(c) {
-                    public void hit(Coord pc, Coord2d mc, ClickInfo inf) {
+                    public void hit(Coord pc, Coord mc, ClickInfo inf) {
                         if (inf == null) {
                             MCache map = ui.sess.glob.map;
-                            int t = map.gettile(mc.floor(tilesz));
+                            int t = map.gettile(nc2tc(mc));
                             Resource res = map.tilesetr(t);
                             if (res != null) {
                                 tooltip = res.name;
@@ -2129,7 +2148,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 
     public boolean drop(final Coord cc, final Coord ul) {
         delay(new Hittest(cc) {
-            public void hit(Coord pc, Coord2d mc, ClickInfo inf) {
+            public void hit(Coord pc, Coord mc, ClickInfo inf) {
                 if ((Config.nodropping || Config.nodropping_all) && !ui.modctrl) {
                     // no dropping at all or when we are on water
                     boolean nodropping = false;
@@ -2138,7 +2157,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                         nodropping = true;
                     } else {
                         // we came here because Config.nodropping is set, check water tiles
-                        int t = glob.map.gettile(player().rc.floor(tilesz));
+                        int t = glob.map.gettile(player().gettc());
                         Resource res = glob.map.tilesetr(t);
                         if (res != null &&
                                 (res.name.equals("gfx/tiles/water") ||
@@ -2152,14 +2171,14 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                     if (nodropping) {
                         // we really don't want dropping, so click is moving
                         if (Config.pf) {
-                            pfLeftClick(mc.floor(), null);
+                            pfLeftClick(nc2mc(mc), null);
                         } else {
-                            wdgmsg("click", pc, mc.floor(posres), 1, 0);
+                            wdgmsg("click", pc, mc, 1, 0);
                         }
                         return;
                 	}
                 }
-                wdgmsg("drop", pc, mc.floor(posres), ui.modflags());
+                wdgmsg("drop", pc, mc, ui.modflags());
             }
         });
         return (true);
@@ -2167,14 +2186,13 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 
     public boolean iteminteract(Coord cc, Coord ul) {
         delay(new Hittest(cc) {
-            public void hit(Coord pc, Coord2d mc, ClickInfo inf) {
+            public void hit(Coord pc, Coord mc, ClickInfo inf) {
                 lastItemactClickArgs = null;
                 if (inf == null && Config.tilecenter) {
-                    mc.x = ((int)mc.x / 11) * 11 + Integer.signum((int)mc.x) * 5;
-                    mc.y = ((int)mc.y / 11) * 11 + Integer.signum((int)mc.y) * 5;
+                    mc = ncCenter(mc);
                 }
 
-                Object[] args = {pc, mc.floor(posres), ui.modflags()};
+                Object[] args = {pc, mc, ui.modflags()};
                 args = Utils.extend(args, gobclickargs(inf));
 
                 if (ui.modshift && ui.modmeta)
@@ -2241,8 +2259,8 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 
         public boolean mmousedown(Coord cc, final int button) {
             delay(new Maptest(cc) {
-                public void hit(Coord pc, Coord2d mc) {
-                    bk.mmousedown(mc.round(), button);
+                public void hit(Coord pc, Coord mc) {
+                    bk.mmousedown(mc, button);
                 }
             });
             return (true);
@@ -2250,8 +2268,8 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 
         public boolean mmouseup(Coord cc, final int button) {
             delay(new Maptest(cc) {
-                public void hit(Coord pc, Coord2d mc) {
-                    bk.mmouseup(mc.round(), button);
+                public void hit(Coord pc, Coord mc) {
+                    bk.mmouseup(mc, button);
                 }
             });
             return (true);
@@ -2259,8 +2277,8 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 
         public boolean mmousewheel(Coord cc, final int amount) {
             delay(new Maptest(cc) {
-                public void hit(Coord pc, Coord2d mc) {
-                    bk.mmousewheel(mc.round(), amount);
+                public void hit(Coord pc, Coord mc) {
+                    bk.mmousewheel(mc, amount);
                 }
             });
             return (true);
@@ -2269,8 +2287,8 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         public void mmousemove(Coord cc) {
             if (mv) {
                 delay(new Maptest(cc) {
-                    public void hit(Coord pc, Coord2d mc) {
-                        bk.mmousemove(mc.round());
+                    public void hit(Coord pc, Coord mc) {
+                        bk.mmousemove(mc);
                     }
                 });
             }
@@ -2316,7 +2334,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                     ol.destroy();
                     mgrab.remove();
                 }
-                sc = mc.div(MCache.tilesz2);
+                sc = nc2tc(mc);
                 modflags = ui.modflags();
                 xl.mv = true;
                 mgrab = ui.grabmouse(MapView.this);
@@ -2330,7 +2348,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         public boolean mmouseup(Coord mc, int button) {
             synchronized (MapView.this) {
                 if (sc != null) {
-                    Coord ec = mc.div(MCache.tilesz2);
+                    Coord ec = nc2tc(mc);
                     xl.mv = false;
                     tt = null;
                     Resource curs = ui.root.getcurs(c);
@@ -2359,7 +2377,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         public void mmousemove(Coord mc) {
             synchronized (MapView.this) {
                 if (sc != null) {
-                    Coord tc = mc.div(MCache.tilesz2);
+                    Coord tc = nc2tc(mc);
                     Coord c1 = new Coord(Math.min(tc.x, sc.x), Math.min(tc.y, sc.y));
                     Coord c2 = new Coord(Math.max(tc.x, sc.x), Math.max(tc.y, sc.y));
                     ol.update(c1, c2);
@@ -2456,8 +2474,8 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     public void togglegrid() {
         showgrid = !showgrid;
         if (showgrid) {
-            Coord tc = new Coord((int) (cc.x / tilesz.x / MCache.cutsz.x - view - 1) * MCache.cutsz.x,
-                    (int) (cc.y / tilesz.y / MCache.cutsz.y - view - 1) * MCache.cutsz.y);
+            Coord tc = new Coord((int) (cc.x / tilensz.x / MCache.cutsz.x - view - 1) * MCache.cutsz.x,
+                    (int) (cc.y / tilensz.y / MCache.cutsz.y - view - 1) * MCache.cutsz.y);
             lasttc = tc;
             gridol.update(tc);
         }

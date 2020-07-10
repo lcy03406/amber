@@ -42,7 +42,7 @@ public class Ridges extends MapMesh.Hooks {
     public static final MapMesh.DataID<Ridges> id = MapMesh.makeid(Ridges.class);
     public static final int segh = 8;
     public final MapMesh m;
-    private static final Coord tilesz = MCache.tilesz2;
+    private static final Coord tilesz = MCache.tilesz.round();
     private final MapMesh.MapSurface ms;
     private final boolean[] breaks;
     private Vertex[][] edges, edgec;

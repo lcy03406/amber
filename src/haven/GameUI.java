@@ -132,8 +132,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
                 Coord mvc = map.rootxlate(ui.mc);
                 if (mvc.isect(Coord.z, map.sz)) {
                     map.delay(map.new Hittest(mvc) {
-                        protected void hit(Coord pc, Coord2d mc, MapView.ClickInfo inf) {
-                            Object[] args = {slot, 1, ui.modflags(), mc.floor(OCache.posres)};
+                        protected void hit(Coord pc, Coord mc, MapView.ClickInfo inf) {
+                            Object[] args = {slot, 1, ui.modflags(), mc};
                             if (inf != null)
                                 args = Utils.extend(args, MapView.gobclickargs(inf));
                             GameUI.this.wdgmsg("belt", args);
