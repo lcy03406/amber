@@ -364,7 +364,7 @@ public class LocalMiniMap extends Widget {
     public void tick(double dt) {
         Gob pl = ui.sess.glob.oc.getgob(MapView.plgob);
         if(pl == null)
-            this.cc = nc2tc(mv.cc);
+            this.cc = MapView.nc2tc(mv.cc);
         else
             this.cc = pl.rc.floor(tilesz);
 

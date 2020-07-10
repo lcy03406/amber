@@ -59,4 +59,8 @@ class Area implements Iterable<Coord> {
         }
         return l
     }
+    
+    public contains(c) {
+        return c.x >= x1 && c.x <= x2 && c.y >= y1 && c.y <= y2
+    }
 }

@@ -4,6 +4,7 @@ BeetBox.init(world)
 
 def config = [
     ['^gfx/invobjs/lettucehead$', 'Split'],
+    ['^gfx/invobjs/fish-.*', 'Butcher'],
     ['^gfx/invobjs/(hen|rooster|squirrel|hedeghog|rabbit-buck|rabbit-doe)$', 'Wring neck'],
     ['^gfx/invobjs/(hen|rooster)-dead$', 'Pluck'],
     ['^gfx/invobjs/rabbit-dead(|-doe)$', 'Flay'],
