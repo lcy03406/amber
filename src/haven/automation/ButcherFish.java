@@ -17,9 +17,10 @@ public class ButcherFish implements Runnable, WItemDestroyCallback {
     public void run() {
         boolean good = true;
         good = good && findAndAct("^gfx/invobjs/fish-.*$", "Butcher");
-        good = good && findAndAct("^gfx/invobjs/(hen|rooster|squirrel|hedeghog|rabbit-buck|rabbit-doe)$", "Wring neck");
-        good = good && findAndAct("^gfx/invobjs/(squirrel|hedeghog|rabbit)-dead(|-buck|-doe)$", "Flay");
+        good = good && findAndAct("^gfx/invobjs/(hen|rooster|squirrel|hedeghog|bogturtle|rabbit-buck|rabbit-doe)$", "Wring neck");
+        good = good && findAndAct("^gfx/invobjs/(squirrel|hedgehog|rabbit)-dead(|-buck|-doe)$", "Flay");
         good = good && findAndAct("^gfx/invobjs/(hen|rooster)-dead$", "Pluck");
+        good = good && findAndAct("^gfx/invobjs/bogturtle-dead$", "Clean");
         good = good && findAndAct("^gfx/invobjs/.*-plucked$", "Clean");
         good = good && findAndAct("^gfx/invobjs/bat-dead$", "Clean");
         good = good && findAndAct("^gfx/invobjs/.*-(carcass|plucked)$", "Clean");
