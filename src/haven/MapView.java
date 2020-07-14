@@ -1535,15 +1535,18 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         Coord gran = (plobgran == 0)?null:tilensz.div(plobgran);
 
         public void adjust(Plob plob, Coord pc, Coord mc, int modflags) {
+            Coord plmc = mc;
             if ((modflags & 2) == 0)
-                plob.rc = nc2rc(ncCenter(mc));
+                plmc = ncCenter(mc);
             else if(gran != null)
-                plob.rc = nc2rc(mc.add(gran.div(2)).div(gran).mul(gran));
+                plmc = mc.add(gran.div(2)).div(gran).mul(gran);
             else
-                plob.rc = nc2rc(mc);
+                plmc = mc;
+            plob.rc = nc2rc(plmc);
             Gob pl = plob.mv().player();
             if ((pl != null) && !freerot)
                 plob.a = Math.round(plob.rc.angle(pl.rc) / (Math.PI / 2)) * (Math.PI / 2);
+            plob.mv().tooltip = plmc.toString() + "#" + plob.a;
         }
 
         public boolean rotate(Plob plob, int amount, int modflags) {
@@ -2095,11 +2098,11 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                 delay(new Hittest(c) {
                     protected void hit(Coord pc, Coord mc, ClickInfo inf) {
                         if (inf != null) {
-                            MapView.gobclickargs(inf);
+                            Object[] args = MapView.gobclickargs(inf);
                             if (inf.gob != null) {
                                 Resource res = inf.gob.getres();
                                 if (res != null) {
-                                    tooltip = res.name;
+                                    tooltip = mc.toString() + "#" + res.name + "#" + Arrays.toString(args);
                                     return;
                                 }
                             }
@@ -2124,7 +2127,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                             int t = map.gettile(nc2tc(mc));
                             Resource res = map.tilesetr(t);
                             if (res != null) {
-                                tooltip = res.name;
+                                tooltip = mc.toString() + "#" + res.name;
                                 return;
                             }
                         }
@@ -2136,6 +2139,8 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                     }
                 });
             }
+        } else {
+            tooltip = null;
         }
     }
 
@@ -2257,7 +2262,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         if (selection != null) {
             if (selection.tt != null)
                 return (selection.tt);
-        } else if (tooltip != null && ui.modshift) {
+        } else if (tooltip != null) {
             return Text.render(tooltip);
         }
         return (super.tooltip(c, prev));

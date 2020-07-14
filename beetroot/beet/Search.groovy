@@ -14,10 +14,16 @@ class Search  {
         return BeetBox.world.gui.map.glob.oc
     }
     
-    private static pl() {
+    public static pl() {
         return mv().player()
     }
     
+    public static area(d) {
+        def c = pl().tc
+        return new Area(c.sub(d, d), c.add(d+1, d+1))
+    }
+
+
     public static search(f) {
         def l = []
         def oc = oc()
@@ -36,6 +42,10 @@ class Search  {
     }
     
     public static matchArea(name, area) {
-        return search({gob -> gob.getres()?.name ==~ name && area})
+        return search({gob -> gob.getres()?.name ==~ name && area.contains(gob.tc)})
+    }
+    
+    public static matchSquare(name, d) {
+        return matchArea(name, area(d))
     }
 }

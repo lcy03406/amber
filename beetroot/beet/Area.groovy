@@ -41,6 +41,13 @@ class Area implements Iterable<Coord> {
         y2 = Math.max(c1.y, c2.y)
     }
     
+    public Area(x1, x2, y1, y2) {
+        this.x1 = Math.min(x1, x2)
+        this.x2 = Math.max(x1, x2)
+        this.y1 = Math.min(y1, y2)
+        this.y2 = Math.max(y1, y2)
+    }
+    
     public Iter iterator() {
         return new Iter()
     }

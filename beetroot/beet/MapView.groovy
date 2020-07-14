@@ -6,12 +6,8 @@ import haven.Coord2d
 
 class MapView  {
     
-    private static mv() {
+    public static mv() {
         return BeetBox.world.gui.map
-    }
-    
-    private static pl() {
-        return mv().player()
     }
     
     public static area() {
