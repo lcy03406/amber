@@ -1523,13 +1523,14 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         camera.resized();
     }
 
+    //Wallext
     public static interface PlobAdjust {
-        public void adjust(Plob plob, Coord pc, Coord mc, int modflags);
+        public void adjust(Plob plob, Coord pc, Coord2d mc, int modflags);
 
         public boolean rotate(Plob plob, int amount, int modflags);
     }
 
-    public static class StdPlace implements PlobAdjust {
+    public static class StdPlace {
         boolean freerot = false;
         Coord gran = (plobgran == 0)?null:tilensz.div(plobgran);
 
@@ -1559,7 +1560,8 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     }
 
     public class Plob extends Gob {
-        public PlobAdjust adjust = new StdPlace();
+        public PlobAdjust adjust = null;
+        public StdPlace place = new StdPlace();
         Coord lastmc = null;
 
         private Plob(Indir<Resource> res, Message sdt) {
@@ -1583,7 +1585,11 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
             }
 
             public void hit(Coord pc, Coord mc) {
-                adjust.adjust(Plob.this, pc, mc, modflags);
+                if (adjust == null) {
+                    place.adjust(Plob.this, pc, mc, modflags);
+                } else {
+                    adjust.adjust(Plob.this, pc, nc2rc(mc), modflags);
+                }
                 lastmc = pc;
             }
         }
