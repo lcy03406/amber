@@ -1575,6 +1575,14 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         public MapView mv() {
             return (MapView.this);
         }
+        
+        public boolean rotate(Plob plob, int amount, int modflags) {
+            if (adjust == null) {
+                return place.rotate(placing, amount, ui.modflags());
+            } else {
+                return adjust.rotate(placing, amount, ui.modflags());
+            }
+        }
 
         private class Adjust extends Maptest {
             int modflags;
@@ -2147,7 +2155,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     public boolean mousewheel(Coord c, int amount) {
         if ((grab != null) && grab.mmousewheel(c, amount))
             return (true);
-        if ((placing != null) && placing.adjust.rotate(placing, amount, ui.modflags()))
+        if ((placing != null) && placing.rotate(placing, amount, ui.modflags()))
             return (true);
         return (((Camera) camera).wheel(c, amount));
     }
@@ -2215,9 +2223,9 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 
     public boolean keydown(KeyEvent ev) {
         if (placing != null) {
-            if ((ev.getKeyCode() == KeyEvent.VK_LEFT) && placing.adjust.rotate(placing, -1, ui.modflags()))
+            if ((ev.getKeyCode() == KeyEvent.VK_LEFT) && placing.rotate(placing, -1, ui.modflags()))
                 return (true);
-            if ((ev.getKeyCode() == KeyEvent.VK_RIGHT) && placing.adjust.rotate(placing, 1, ui.modflags()))
+            if ((ev.getKeyCode() == KeyEvent.VK_RIGHT) && placing.rotate(placing, 1, ui.modflags()))
                 return (true);
         }
         if (camera.keydown(ev))
