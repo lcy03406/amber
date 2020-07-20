@@ -64,7 +64,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     private MCache.Overlay miningOverlay;
     private Coord3f camoff = new Coord3f(Coord3f.o);
     public double shake = 0.0;
-    public static int plobgran = Utils.getprefi("placegridval", 8);
+    public static int plobgran = Utils.getprefi("placegridval", 32);
     private static final Map<String, Class<? extends Camera>> camtypes = new HashMap<String, Class<? extends Camera>>();
     public String tooltip;
     private boolean showgrid;
@@ -2444,7 +2444,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     private Camera restorecam() {
         Class<? extends Camera> ct = camtypes.get(Utils.getpref("defcam", null));
         if (ct == null)
-            return (new SOrthoCam(true));
+            return (new FreeCam());
         String[] args = (String[]) Utils.deserialize(Utils.getprefb("camargs", null));
         if (args == null) args = new String[0];
         try {
