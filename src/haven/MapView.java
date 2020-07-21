@@ -67,7 +67,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     public static int plobgran = Utils.getprefi("placegridval", 32);
     private static final Map<String, Class<? extends Camera>> camtypes = new HashMap<String, Class<? extends Camera>>();
     public String tooltip;
-    private boolean showgrid;
+    private boolean showgrid = true;
     private TileOutline gridol;
     private Coord lasttc = Coord.z;
     private static final Gob.Overlay rovlsupport = new Gob.Overlay(new BPRadSprite(100.0F, 0, BPRadSprite.smatDanger));
