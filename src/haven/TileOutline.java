@@ -41,6 +41,8 @@ public class TileOutline implements Rendered {
 
     @Override
     public boolean setup(RenderList rl) {
+    	if (ul == null)
+    		return true;
         rl.prepo(location);
         rl.prepo(States.ndepthtest);
         rl.prepo(last);
