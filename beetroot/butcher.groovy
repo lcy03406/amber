@@ -10,8 +10,10 @@ def config = [
     ['^gfx/invobjs/rabbit-dead(|-doe)$', 'Flay'],
     ['^gfx/invobjs/.*-plucked$', 'Clean'],
     ['^gfx/invobjs/rabbit-carcass$', 'Clean'],
+    ['^gfx/invobjs/bat-dead$', 'Clean'],
     ['^gfx/invobjs/chicken-cleaned$', 'Butcher'],
     ['^gfx/invobjs/rabbit-clean$', 'Butcher'],
+    ['^gfx/invobjs/bat-clean$', 'Butcher'],
 ]
 
 for (conf in config) {

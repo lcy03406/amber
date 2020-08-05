@@ -85,7 +85,7 @@ public class Engine {
             println("beetbox finish " + name);
         } catch (ThreadDeath td) {
             println("beetbox death");
-            throw(td);
+            //throw(td);
         } catch (Exception ex) {
             println(ex.toString());
             StackTraceUtils.printSanitizedStackTrace(ex, world.ui.cons.out);

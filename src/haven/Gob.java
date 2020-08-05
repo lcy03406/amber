@@ -317,6 +317,14 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     public double geta() {
         return a;
     }
+    
+    public int getstage() {
+        ResDrawable draw = getattr(ResDrawable.class);
+        if (draw != null && draw.sdt != null) {
+            return draw.sdt.peekrbuf(0);
+        }
+        return -1;
+    }
 
     private Class<? extends GAttrib> attrclass(Class<? extends GAttrib> cl) {
         while (true) {

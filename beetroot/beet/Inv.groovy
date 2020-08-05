@@ -1,16 +1,15 @@
 package beet
 
-import haven.Inventory
 import haven.Loading
 import haven.WItem
 import haven.Widget
 
 class Inv  {
-    public static Inventory maininv() {
+    public static def maininv() {
         return BeetBox.world.gui.maininv
     }
     
-    public static def matchItem(Inventory inv, res) {
+    public static def matchItem(inv, res) {
         inv ?= maininv()
         def items = [];
         for (Widget wdg = inv.child; wdg != null; wdg = wdg.next) {
@@ -28,10 +27,20 @@ class Inv  {
         return items;
     }
     
-    public static def matchAndAct(Inventory inv, res, iact) {
+    public static def matchAndAct(inv, res, iact) {
         inv ?= maininv()
         def items = matchItem(inv, res)
         items.each{wi -> Item.iact(wi, iact)}
         return items.size()
+    }
+    
+    public static def takeOne(inv, res) {
+        inv ?= maininv()
+        def items = matchItem(inv, res)
+        if (items.size() == 0)
+            return false
+        def item = items[0]
+        Item.take(item)
+        return true
     }
 }

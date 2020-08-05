@@ -2098,13 +2098,23 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
                 delay(new Hittest(c) {
                     protected void hit(Coord pc, Coord mc, ClickInfo inf) {
                         if (inf != null) {
-                            Object[] args = MapView.gobclickargs(inf);
-                            if (inf.gob != null) {
-                                Resource res = inf.gob.getres();
-                                if (res != null) {
-                                    tooltip = mc.toString() + "#" + res.name + "#" + Arrays.toString(args);
-                                    return;
+                            try {
+                                Object[] args = MapView.gobclickargs(inf);
+                                if (inf.gob != null) {
+                                    Resource res = inf.gob.getres();
+                                    if (res != null) {
+                                        tooltip = mc.toString() + "\n" + res.name + "\n" + Arrays.toString(args);
+                                        tooltip += "\nols " + inf.gob.ols.size();
+                                        for (Gob.Overlay ol : inf.gob.ols) {
+                                            tooltip += "\n" + ol.spr.res == null ? "null" : ol.spr.res.name;
+                                        }
+                                        tooltip += "\nstage: " + inf.gob.getstage();
+                                        return;
+                                    }
                                 }
+                            } catch (Exception e) {
+                                tooltip += "\nException!";
+                                return;
                             }
                         }
                         tooltip = null;
@@ -2263,7 +2273,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
             if (selection.tt != null)
                 return (selection.tt);
         } else if (tooltip != null) {
-            return Text.render(tooltip);
+            return RichText.render(tooltip, 400);
         }
         return (super.tooltip(c, prev));
     }
