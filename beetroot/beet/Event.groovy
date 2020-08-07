@@ -57,8 +57,12 @@ class Event  {
             if (ev == null)
                 return null;
             //:BeetBox.println("ev:${ev?.name}:${ev?.args}")
-            if (filter(ev))
+            if (filter(ev)) {
+                synchronized (q) {
+                    q.clear()
+                }
                 return ev;
+            }
         }
     }
     

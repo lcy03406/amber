@@ -26,4 +26,8 @@ class Item  {
     public static drop(WItem wi) {
         wi.item.wdgmsg('drop', Coord.z)
     }
+    
+    public static itemact(WItem wi) {
+        wi.item.wdgmsg('itemact', 0)
+    }
 }

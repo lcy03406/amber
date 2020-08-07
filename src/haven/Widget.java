@@ -276,12 +276,13 @@ public class Widget {
     }
     
     private Coord getWindowCoord(Widget child, String cap, Coord sc) {
-        if ("Table".equals(cap) || ("Chest").equals(cap))
-            return sc;
-        Coord c = Utils.getprefc(cap + "_c", sc);
-        if (c != sc && !c.add(child.sz).isect(Coord.z, sz))
-            return sc;
-        return c;
+        return sc;
+//        if ("Table".equals(cap) || ("Chest").equals(cap))
+//            return sc;
+//        Coord c = Utils.getprefc(cap + "_c", sc);
+//        if (c != sc && !c.add(child.sz).isect(Coord.z, sz))
+//            return sc;
+//        return c;
     }
 
     public <T extends Widget> T add(T child, Coord c) {

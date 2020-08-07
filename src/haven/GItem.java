@@ -226,6 +226,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
             if (rawinfo != null)
                 quality = null;
             rawinfo = new ItemInfo.Raw(args);
+            BeetBox.event("ItemTt", this);
         } else if (name == "meter") {
             meter = (int)((Number)args[0]).doubleValue();
             metertex = Text.renderstroked(String.format("%d%%", meter), Color.WHITE, Color.BLACK, num10Fnd).tex();
@@ -255,6 +256,32 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
             }
         }
         return quality;
+    }
+    
+    public double getq() {
+        QBuff qq = quality();
+        return qq == null ? 0 : qq.q;
+    }
+    
+    public int getn() {
+        try {
+            for (ItemInfo info : info()) {
+                if (info instanceof ItemInfo.Contents) {
+                    for (ItemInfo inf : ((ItemInfo.Contents)info).sub) {
+                        if (inf instanceof Amount) {
+                            return ((Amount) inf).itemnum();
+                        }
+                    }
+                }
+            }
+            for (ItemInfo info : info()) {
+                if (info instanceof Amount) {
+                    return ((Amount) info).itemnum();
+                }
+            }
+        } catch (Loading l) {
+        }
+        return 0;
     }
 
     public ItemInfo.Contents getcontents() {
