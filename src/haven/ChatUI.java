@@ -777,8 +777,7 @@ public class ChatUI extends Widget {
                         OCache oc = gameui().map.glob.oc;
                         Gob gob = oc.getgob(gobid);
                         if (gob != null) {
-                            gob.delattr(GobHighlight.class);
-                            gob.setattr(new GobHighlight(gob));
+                            gob.highlight();
                             oc.changed(gob);
                             return;
                         }

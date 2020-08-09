@@ -2,9 +2,17 @@ import beet.*
 
 BeetBox.init(world);
 
-def gobs = Search.match('^gfx/terobjs/dreca$')
+def gobs = Search.matchSquare('^gfx/terobjs/dreca$', 10)
 for (gob in gobs) {
-    Gob.click(gob, 2, 0)
-    FlowerMenu.openselect('Harvest')
-    Event.expect('ItemAdd')
+    gob.highlight()
+    Gob.click(gob, 3, 0, 0, -1)
+    if (FlowerMenu.waitopen(1000)) {
+        FlowerMenu.select('Harvest')
+        Event.expect('ItemAdd')
+        Gob.click(gob, 3, 0, 0, -1)
+        if (FlowerMenu.waitopen(1000)) {
+            FlowerMenu.select('Harvest')
+            Event.expect('ItemAdd')
+        }
+    }
 }

@@ -65,15 +65,32 @@ class Event  {
             }
         }
     }
-    
-    public static until(f) {
+
+    public static waituntil(ms, f) {
         push(f)
-        def ev = dispatch(0)
+        def ev = dispatch(ms)
         pop()
         return ev
+    }
+
+    public static waitexpect(ms, name) {
+        return waituntil(ms, {ev -> ev.name == name})?.args
+    }
+
+    public static waitexpect(ms, name, f) {
+        return waituntil(ms, {ev -> ev.name == name && f(ev)})?.args
+    }
+
+    
+    public static until(f) {
+        return waituntil(0, f);
     }
     
     public static expect(name) {
         return until({ev -> ev.name == name}).args
+    }
+
+    public static expect(name, f) {
+        return until({ev -> ev.name == name && f(ev)}).args
     }
 }

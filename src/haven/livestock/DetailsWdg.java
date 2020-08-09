@@ -70,8 +70,7 @@ public class DetailsWdg extends Widget {
     public boolean mousedown(Coord c, int button) {
         Gob gob = gameui().map.glob.oc.getgob(animal.gobid);
         if (gob != null) {
-            gob.delattr(GobHighlight.class);
-            gob.setattr(new GobHighlight(gob));
+            gob.highlight();
             if (button == 3)
                 gameui().map.wdgmsg("click", gob.sc, gob.getnc(), 3, 0, 0, (int) gob.id, gob.getnc(), 0, -1);
         }

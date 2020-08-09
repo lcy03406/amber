@@ -10,7 +10,7 @@ def step() {
                 if (i1 != i2 && i2.item.n < 50 && i1.item.getres().name == i2.item.getres().name && i1.item.q == i2.item.q) {
                     Item.take(i1)
                     Item.itemact(i2)
-                    Event.expect('ItemTt')
+                    Event.expect('ItemTt', {ev.args[0] == i2})
                     return true
                 }
             }

@@ -3,17 +3,24 @@ package beet
 import java.util.List
 
 class FlowerMenu  {
-    public static def waitopen() {
-        return Event.expect('FlowerMenu')
+    private static w;
+    public static def waitopen(ms) {
+        def args = Event.waitexpect(ms, 'FlowerMenu')
+        if (args) {
+            w = args?[0]
+        }
+        return args
     }
     
-    public static void select(w, int idx) {
+    public static void select(int idx) {
         w.wdgmsg('cl', idx, 0)
+        w = null
     }
     
-    public static void select(w, String name) {
+    public static void select(String name) {
         def petal = w.opts.find({it.name == name})
         w.wdgmsg('cl', petal.num, 0)
+        w = null
     }
     
     public static void openselect(name) {

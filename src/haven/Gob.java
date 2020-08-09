@@ -858,4 +858,9 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 
         return true;
     }
+    
+    public void highlight() {
+        delattr(GobHighlight.class);
+        setattr(new GobHighlight(this));
+    }
 }
